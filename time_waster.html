@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Infinite Game Waster 9000: Zero Effort Edition</title>
+    <style>
+        /* General Theme */
+        body {
+            font-family: 'Consolas', monospace;
+            background-color: #0a0a0a; /* Deep Black */
+            color: #e0f7fa; /* Light Blue Text */
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #4fc3f7; /* Accent Blue */
+            margin-bottom: 20px;
+        }
+
+        /* Container for SPA structure */
+        #mainContainer {
+            width: 95%;
+            max-width: 1200px;
+            display: flex;
+            gap: 20px;
+            background-color: #1a237e; /* Deep Navy Blue */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(79, 195, 247, 0.2);
+            min-height: 70vh;
+        }
+
+        /* Game Menu */
+        #mainMenu {
+            width: 300px;
+            overflow-y: auto;
+            max-height: 70vh;
+            border-right: 1px solid #4fc3f7;
+            padding-right: 15px;
+        }
+
+        #mainMenu button {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 10px;
+            margin-bottom: 5px;
+            background-color: #2c3e50;
+            color: #e0f7fa;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+            font-size: 0.9em;
+        }
+
+        #mainMenu button:hover {
+            background-color: #4fc3f7;
+            color: #0a0a0a;
+        }
+        
+        #mainMenu button.active {
+            background-color: #81d4fa;
+            color: #0a0a0a;
+            font-weight: bold;
+        }
+
+        /* Game Area (Single Game Display) */
+        #gameArea {
+            flex-grow: 1;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .game-display {
+            background-color: #0a0a0a;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.1);
+        }
+
+        .game-display h2 {
+            color: #81d4fa;
+            border-bottom: 1px solid #4fc3f7;
+            padding-bottom: 5px;
+            margin-top: 0;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        /* Shared Components Styling */
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.9em;
+            cursor: pointer;
+            background-color: #4fc3f7;
+            color: #0a0a0a;
+            transition: background-color 0.2s;
+        }
+        
+        button:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        input[type="number"], input[type="text"], select {
+            padding: 8px;
+            border: 1px solid #4fc3f7;
+            border-radius: 4px;
+            background-color: #0a0a0a;
+            color: #e0f7fa;
+            width: 90%;
+            max-width: 200px;
+            box-sizing: border-box;
+            margin: 5px 0;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        .game-output {
+            margin-top: 15px;
+            padding: 10px;
+            font-size: 1.1em;
+            min-height: 30px;
+            word-wrap: break-word;
+            text-align: center;
+            border-top: 1px dashed #2c3e50;
+        }
+        
+        /* Specific Ouija Board Styling */
+        #ouijaBoardContainer {
+            position: relative;
+            width: 100%;
+            height: 100px; 
+            margin: 10px auto;
+            border: 2px solid #4fc3f7;
+            background-color: #000033;
+            font-size: 0.8em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            overflow: hidden;
+        }
+        .ouija-row { width: 98%; display: flex; justify-content: space-around; margin: 3px 0; }
+        .ouija-char { padding: 0 3px; font-weight: bold; cursor: default; }
+        #planchette {
+            position: absolute;
+            width: 20px; height: 20px;
+            background-color: #ffeb3b;
+            border-radius: 50%;
+            border: 3px solid #ff5252;
+            transition: transform 0.8s ease-in-out;
+            transform: translate(-50%, -50%); /* Start centered */
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #planchette::after { content: '👁'; font-size: 10px; color: #0a0a0a; }
+        #currentOuijaAnswer { font-size: 1em; text-align: center; min-height: 50px;}
+
+    </style>
+</head>
+<body>
+    <h1>The Infinite Game Waster 9000: Zero Effort Edition</h1>
+    <p>100 distractions deployed. Select a game to begin wasting time.</p>
+
+    <div id="mainContainer">
+        <div id="mainMenu">
+            <!-- Menu buttons loaded by JS -->
+        </div>
+
+        <div id="gameArea">
+            <p>Select a game from the menu on the left to start playing.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', initializeWaster);
+
+        // --- Core Data Structure for 100 Games ---
+        const GAMES_DATA = [
+            // ROW 1 (Games 1-10)
+            { id: 1, title: 'RPS (Clicker)', html: `<h2>1. RPS (Clicker)</h2><p>P <span id="rpsPlayerScore">0</span> | C <span id="rpsCompScore">0</span></p><div class="controls"><button onclick="playRPS('Rock')">Rock</button><button onclick="playRPS('Paper')">Paper</button><button onclick="playRPS('Scissors')">Scissors</button></div><div class="game-output" id="rpsResult">Choose.</div>` },
+            { id: 2, title: 'Guesser (Custom)', html: `<h2>2. Guesser (Custom)</h2><p>Range Max: <input type="number" id="guessRange" value="100" min="10" style="width:100px;"></p><p>Attempts Left: <span id="guessAttempts">5</span></p><input type="number" id="guessInput" placeholder="Guess (1-Max)"><div class="controls"><button onclick="checkGuess()">Submit</button><button onclick="initializeGuessGame()">Reset</button></div><div class="game-output" id="guessResult">Start.</div>` },
+            { id: 3, title: 'Reaction Test', html: `<h2>3. Reaction Test</h2><p>Max Delay: <input type="number" id="reactionMaxDelay" value="3000" min="500" style="width:100px;"> ms</p><p>Best Time: <span id="bestTime">N/A</span> ms</p><button id="reactionButton" onclick="handleReactionClick()">Start Test</button><div class="game-output" id="reactionTimeResult">Wait for green.</div>` },
+            { id: 4, title: 'Coin Flip (Custom Bias)', html: `<h2>4. Coin Flip (Custom)</h2><p>Heads Bias %: <input type="number" id="coinBias" value="50" min="0" max="100" style="width:100px;"></p><p>Total Heads: <span id="coinHeads">0</span></p><button onclick="flipCoin()">Flip Coin</button><div class="game-output" id="coinResult">Ready.</div>` },
+            { id: 5, title: 'Dice Roller (D-Custom)', html: `<h2>5. Dice Roller (D-Custom)</h2><p>Sides: <input type="number" id="diceSides" value="6" min="2" style="width:100px;"></p><p>Total Rolls: <span id="diceRolls">0</span></p><button onclick="rollDice()">Roll</button><div class="game-output" id="diceResult">Roll.</div>` },
+            { id: 6, title: 'Magic 8-Ball', html: `<h2>6. Magic 8-Ball</h2><input type="text" id="eightBallQuestion" placeholder="Ask a Yes/No Question"><button onclick="askEightBall()">Ask</button><div class="game-output" id="eightBallResult">Query.</div>` },
+            { id: 7, title: 'Clicker (Custom Rate)', html: `<h2>7. Clicker (Custom Rate)</h2><p>Rate: <input type="number" id="clickRate" value="1" min="1" style="width:100px;"></p><p>Score: <span id="clickerScore">0</span></p><div class="controls"><button onclick="increaseClicker()">Click</button><button onclick="resetClicker()">Reset</button></div><div class="game-output">Infinite.</div>` },
+            { id: 8, title: 'High/Low Card', html: `<h2>8. High/Low Card</h2><p>Current Card: <span id="currentCard">?</span></p><div class="controls"><button onclick="playCardGuess('High')">Higher</button><button onclick="playCardGuess('Low')">Lower</button></div><div class="game-output" id="cardResult">Guess next.</div>` },
+            { id: 9, title: 'PWD Generator', html: `<h2>9. PWD Generator</h2><p>Length (4-20): <input type="number" id="pwdLength" value="8" min="4" max="20" style="width:100px;"></p><label><input type="checkbox" id="chkSymbols" checked> Include Symbols</label><button onclick="generatePassword()">Generate</button><div class="game-output" id="passwordResult">Click.</div>` },
+            { id: 10, title: 'Door Selector (Custom)', html: `<h2>10. Door Selector (Custom)</h2><p>Number of Doors: <input type="number" id="numDoors" value="3" min="2" max="5" style="width:100px;"></p><div class="controls" id="doorButtons"></div><div class="game-output" id="doorResult">Pick a door.</div>` },
+            
+            // ROW 2 (Games 11-20)
+            { id: 11, title: 'Math Quiz (+/-)', html: `<h2>11. Math Quiz (+/-)</h2><p id="mathQuestion" style="font-size:1.5em;">?</p><input type="number" id="mathAnswer" placeholder="Answer"><button onclick="submitMathAnswer()">Check</button><div class="game-output" id="mathResult">Solve.</div>` },
+            { id: 12, title: 'Vowel Counter', html: `<h2>12. Vowel Counter</h2><input type="text" id="textInput" placeholder="Type text here..."><button onclick="countLetters()">Analyze</button><div class="game-output" id="countResult">Vowels: 0 | Consonants: 0</div>` },
+            { id: 13, title: 'Collector (Multi)', html: `<h2>13. Collector (Multi)</h2><p>Gems: <span id="resourceGems">0</span> | Ore: <span id="resourceOre">0</span></p><div class="controls"><button onclick="collectResource('Gem')">Collect Gem</button><button onclick="collectResource('Ore')">Collect Ore</button></div><div class="game-output" id="resourceResult">Mine.</div>` },
+            { id: 14, title: 'Stopwatch (Lap)', html: `<h2>14. Stopwatch (Lap)</h2><p id="stopwatchDisplay" style="font-size:1.8em;">00:00.00</p><div class="controls"><button id="startStopwatch" onclick="startStopwatch()">Start</button><button id="lapStopwatch" onclick="lapStopwatch()" disabled>Lap</button><button id="resetStopwatch" onclick="resetStopwatch()">Reset</button></div><div class="game-output" id="lapHistory"></div>` },
+            { id: 15, title: 'Quote Generator', html: `<h2>15. Quote Gen</h2><button onclick="generateQuote()">Get Quote</button><div class="game-output" id="quoteResult">Wisdom awaits.</div>` },
+            { id: 16, title: 'Streak Tracker', html: `<h2>16. Streak Tracker</h2><p>Heads Prob %: <input type="number" id="flipProb" value="50" min="1" max="99" style="width:100px;"></p><p>Current Streak: <span id="streakCount">0</span></p><div class="controls"><button onclick="flipStreak('Heads')">Heads</button><button onclick="flipStreak('Tails')">Tails</button></div><div class="game-output" id="streakResult">Beat the odds!</div>` },
+            { id: 17, title: 'Choice Dilemma', html: `<h2>17. Choice Dilemma</h2><p>Make a meaningless binary choice.</p><div class="controls"><button onclick="makeDilemmaChoice('Yes')">Yes</button><button onclick="makeDilemmaChoice('No')">No</button></div><div class="game-output" id="dilemmaResult">Decision.</div>` },
+            { id: 18, title: 'Temp Converter', html: `<h2>18. Temp Converter</h2><input type="number" id="tempInput" placeholder="Temperature"><div class="controls"><button onclick="convertTemp('C')">C→F</button><button onclick="convertTemp('F')">F→C</button></div><div class="game-output" id="tempResult">Result.</div>` },
+            { id: 19, title: 'ASCII Lookup', html: `<h2>19. ASCII Lookup</h2><input type="text" id="asciiInput" maxlength="1" placeholder="Character"><button onclick="getAsciiValue()">Lookup</button><div class="game-output" id="asciiResult">Value: N/A</div>` },
+            { id: 20, title: 'Color Mixer (Hex)', html: `<h2>20. Color Mixer (Hex)</h2><select id="colorSelect1"><option value="#ff0000">Red</option><option value="#00ff00">Green</option><option value="#0000ff">Blue</option></select> + <select id="colorSelect2"><option value="#ff0000">Red</option><option value="#00ff00">Green</option><option value="#0000ff">Blue</option></select><button onclick="mixColors()">Mix</button><div class="game-output"><div id="mixedColorBox" style="height: 30px; width: 100%; background: #ff0000;"></div></div>` },
+            
+            // ROW 3 (Games 21-30)
+            { id: 21, title: 'VISUAL OUIJA BOARD', html: `<h2>21. VISUAL OUIJA BOARD</h2><input type="text" id="ouijaQuestion" placeholder="Ask a Question" maxlength="30"><div id="ouijaBoardContainer"><div id="planchette"></div><div class="ouija-row"><span id="o_YES" class="ouija-char">YES</span><span id="o_NO" class="ouija-char">NO</span><span id="o_GOODBYE" class="ouija-char">GOODBYE</span></div><div class="ouija-row"><span id="o_1" class="ouija-char">1</span><span id="o_2" class="ouija-char">2</span><span id="o_3" class="ouija-char">3</span><span id="o_4" class="ouija-char">4</span><span id="o_5" class="ouija-char">5</span><span id="o_6" class="ouija-char">6</span><span id="o_7" class="ouija-char">7</span><span id="o_8" class="ouija-char">8</span><span id="o_9" class="ouija-char">9</span><span id="o_0" class="ouija-char">0</span></div><div class="ouija-row"><span id="o_A" class="ouija-char">A</span><span id="o_B" class="ouija-char">B</span><span id="o_C" class="ouija-char">C</span><span id="o_D" class="ouija-char">D</span><span id="o_E" class="ouija-char">E</span><span id="o_F" class="ouija-char">F</span><span id="o_G" class="ouija-char">G</span><span id="o_H" class="ouija-char">H</span><span id="o_I" class="ouija-char">I</span><span id="o_J" class="ouija-char">J</span><span id="o_K" class="ouija-char">K</span><span id="o_L" class="ouija-char">L</span><span id="o_M" class="ouija-char">M</span><span id="o_N" class="ouija-char">N</span><span id="o_O" class="ouija-char">O</span><span id="o_P" class="ouija-char">P</span><span id="o_Q" class="ouija-char">Q</span><span id="o_R" class="ouija-char">R</span><span id="o_S" class="ouija-char">S</span><span id="o_T" class="ouija-char">T</span><span id="o_U" class="ouija-char">U</span><span id="o_V" class="ouija-char">V</span><span id="o_W" class="ouija-char">W</span><span id="o_X" class="ouija-char">X</span><span id="o_Y" class="ouija-char">Y</span><span id="o_Z" class="ouija-char">Z</span></div></div><div class="controls"><button id="ouijaButton" onclick="moveRandomly()">Ask Spirit / Next Letter</button><button id="ouijaResetButton" onclick="resetOuija()">New Question</button></div><div class="game-output" id="currentOuijaAnswer">Planchette waits...</div>` },
+            { id: 22, title: 'Arbitrary Progress', html: `<h2>22. Arbitrary Progress</h2><p>Step Size: <input type="number" id="progressStep" value="10" min="1" style="width:100px;"></p><p>Level: <span id="progressLevel">0</span>%</p><button onclick="increaseProgress()">Advance</button><div class="game-output" id="progressResult">Keep grinding.</div>` },
+            { id: 23, title: 'Binary Converter', html: `<h2>23. Binary Converter</h2><input type="number" id="decInput" placeholder="Decimal Number"><button onclick="convertToBinary()">Convert</button><div class="game-output" id="binaryResult">Binary: N/A</div>` },
+            { id: 24, title: 'Shape Generator', html: `<h2>24. Shape Generator (Custom)</h2><input type="text" id="customShapes" placeholder="Sq, Tri, Cir" value="Circle,Square,Triangle,Hexagon"><button onclick="generateShape()">Generate</button><div class="game-output" id="shapeResult">Shape: N/A</div>` },
+            { id: 25, title: 'Palindrome Check', html: `<h2>25. Palindrome Check</h2><input type="text" id="palindromeInput" placeholder="Word/Phrase"><button onclick="checkPalindrome()">Check</button><div class="game-output" id="palindromeResult">Is it?</div>` },
+            { id: 26, title: 'Odd/Even Clicker', html: `<h2>26. Odd/Even Clicker</h2><p>Max Number: <input type="number" id="oddEvenMax" value="100" min="10" style="width:100px;"></p><p>Score: <span id="oddEvenScore">0</span></p><div class="controls"><button onclick="clickOddEven(true)">Guess Odd</button><button onclick="clickOddEven(false)">Guess Even</button></div><div class="game-output" id="oddEvenResult">Guess correctly.</div>` },
+            { id: 27, title: 'Vending Machine', html: `<h2>27. Vending Machine</h2><p>Cost: <input type="number" id="vmCost" value="5" min="1" style="width:100px;"></p><p>Credits: <span id="vmCredits">10</span></p><button onclick="buyItem()">Buy Item</button><div class="game-output" id="vmResult">Get junk.</div>` },
+            { id: 28, title: 'Hex Color Gen', html: `<h2>28. Hex Color Gen</h2><button onclick="generateHexColor()">New Hex</button><div class="game-output" id="hexResult" style="height:30px; line-height:30px;">#FFFFFF</div>` },
+            { id: 29, title: 'Time Waster Timer', html: `<h2>29. Time Waster Timer</h2><p id="wasteTimer" style="font-size:1.8em;">0s</p><div class="controls"><button onclick="startWasteTimer()">Start</button><button onclick="stopWasteTimer()">Stop</button></div><div class="game-output">Watch time fly.</div>` },
+            { id: 30, title: 'Random Letter', html: `<h2>30. Random Letter</h2><button onclick="generateRandomLetter()">Get Letter</button><div class="game-output" id="letterResult" style="font-size: 2em;">?</div>` },
+
+            // ROW 4 (Games 31-40)
+            { id: 31, title: 'Simple Calculator', html: `<h2>31. Simple Calculator</h2><input type="text" id="calcInput" placeholder="e.g., 2+2*5"><button onclick="calculate()">Calculate</button><div class="game-output" id="calcResult">Result.</div>` },
+            { id: 32, title: 'Quote Reverser', html: `<h2>32. Quote Reverser</h2><p>Length: <input type="number" id="reverseLen" value="10" min="5" max="30" style="width:100px;"></p><button onclick="reverseQuote()">Reverse Quote Snippet</button><div class="game-output" id="reverseResult"></div>` },
+            { id: 33, title: 'Fibonacci Step', html: `<h2>33. Fibonacci Step</h2><p>Current Number: <span id="fibCurrent">1</span></p><button onclick="nextFib()">Next Step</button><div class="game-output" id="fibResult">Sequence.</div>` },
+            { id: 34, title: 'Health Bar Sim', html: `<h2>34. Health Bar Sim</h2><p>Damage Max: <input type="number" id="damageMax" value="20" min="5" style="width:100px;"></p><p>Health: <span id="healthDisplay" style="font-weight:bold;">100</span> / 100</p><div class="controls"><button onclick="takeDamage()">Damage</button><button onclick="heal()">Heal</button></div><div class="game-output" id="healthResult">Status.</div>` },
+            { id: 35, title: 'Word Censorship', html: `<h2>35. Word Censorship</h2><p>Censor Char: <input type="text" id="censorChar" maxlength="1" value="*"></p><input type="text" id="censorInput" placeholder="Text to Censor"><button onclick="censorVowels()">Censor Vowels</button><div class="game-output" id="censorResult">***</div>` },
+            { id: 36, title: 'Click Limit (Custom)', html: `<h2>36. Click Limit (Custom)</h2><p>Max Clicks: <input type="number" id="maxClickLimit" value="10" min="1" style="width:100px;"></p><p>Clicks Left: <span id="clickLimit">10</span></p><button onclick="limitedClick()">Click</button><div class="game-output" id="limitedResult">Click fast!</div>` },
+            { id: 37, title: 'Word Length Count', html: `<h2>37. Word Length Count</h2><input type="text" id="wordLengthInput" placeholder="Word"><button onclick="countWordLength()">Count</button><div class="game-output" id="wordLengthResult">Length: 0</div>` },
+            { id: 38, title: 'Random Button Press', html: `<h2>38. Random Button Press</h2><p>Click the correct color (changes randomly)</p><button id="targetButton" onclick="clickTarget()">Click Me</button><div class="game-output" id="targetResult">Success?</div>` },
+            { id: 39, title: 'Simple Lottery (Custom)', html: `<h2>39. Simple Lottery (Custom)</h2><p>Cost: <input type="number" id="lottoCost" value="1" min="1" style="width:80px;"> | Win Pct: <input type="number" id="lottoWinPct" value="10" min="1" max="50" style="width:80px;"></p><p>Tickets: <span id="lottoTickets">10</span></p><div class="controls"><button onclick="buyLotto()">Buy Tickets</button><button onclick="checkLotto()">Draw</button></div><div class="game-output" id="lottoResult">Try your luck.</div>` },
+            { id: 40, title: 'Case Converter', html: `<h2>40. Case Converter</h2><input type="text" id="capInput" placeholder="Text"><div class="controls"><button onclick="capitalizeText('upper')">UPPERCASE</button><button onclick="capitalizeText('lower')">lowercase</button></div><div class="game-output" id="capResult"></div>` },
+
+            // ROW 5 (Games 41-50)
+            { id: 41, title: 'Color Guess (3 Opt)', html: `<h2>41. Color Guess (3 Opt)</h2><p style="font-size:1.5em;">Target: <span id="colorGuessTarget" style="color:#0a0a0a;">?</span></p><div class="controls"><button onclick="guessColor(0)">Red</button><button onclick="guessColor(1)">Blue</button><button onclick="guessColor(2)">Green</button></div><div class="game-output" id="colorGuessResult">Guess the color.</div>` },
+            { id: 42, title: 'Character Duplicator', html: `<h2>42. Character Duplicator</h2><p>Count (1-10): <input type="number" id="dupCount" value="5" min="1" max="10" style="width:100px;"></p><input type="text" id="dupInput" maxlength="1" placeholder="Char"><button onclick="duplicateChar()">Duplicate</button><div class="game-output" id="dupResult"></div>` },
+            { id: 43, title: 'Countdown (Custom)', html: `<h2>43. Countdown (Custom)</h2><p>Max Seconds: <input type="number" id="countdownMax" value="5" min="1" style="width:100px;"></p><p id="countdownDisplay" style="font-size:1.8em;">5</p><button onclick="startCountdown()">Start</button><div class="game-output" id="countdownResult">Ready.</div>` },
+            { id: 44, title: 'Simple Pet Sim', html: `<h2>44. Simple Pet Sim</h2><p>Feed Cost: <input type="number" id="petCost" value="1" min="1" style="width:100px;"></p><p>Food Stock: <span id="petFood">10</span></p><button onclick="feedPet()">Feed Pet</button><div class="game-output" id="petResult">Pet: Happy</div>` },
+            { id: 45, title: 'Word Scrambler', html: `<h2>45. Word Scrambler</h2><input type="text" id="scrambleInput" placeholder="Word"><button onclick="scrambleWord()">Scramble</button><div class="game-output" id="scrambleResult"></div>` },
+            { id: 46, title: 'Prime Checker', html: `<h2>46. Prime Checker</h2><input type="number" id="primeInput" placeholder="Number"><button onclick="checkPrime()">Check</button><div class="game-output" id="primeResult">Is it prime?</div>` },
+            { id: 47, title: 'Guess the Shape', html: `<h2>47. Guess the Shape</h2><div class="controls"><button onclick="guessShape('Circle')">Circle</button><button onclick="guessShape('Square')">Square</button><button onclick="guessShape('Triangle')">Triangle</button></div><div class="game-output" id="shapeGuessResult">Guess.</div>` },
+            { id: 48, title: 'Click Speed Test', html: `<h2>48. Click Speed</h2><p>Duration: <input type="number" id="speedDuration" value="5" min="2" max="10" style="width:100px;">s</p><p>Clicks/s: <span id="speedDisplay">0</span></p><button onclick="startClickSpeed()">Start Test</button><div class="game-output" id="speedResult">Go!</div>` },
+            { id: 49, title: 'List Shuffler', html: `<h2>49. List Shuffler</h2><input type="text" id="listInput" placeholder="A, B, C, D"><button onclick="shuffleList()">Shuffle</button><div class="game-output" id="listResult"></div>` },
+            { id: 50, title: 'Dice Sum (Multi)', html: `<h2>50. Dice Sum (Multi)</h2><p>Num Dice: <input type="number" id="numDice" value="2" min="1" max="5" style="width:100px;"></p><p>Running Total: <span id="diceSumTotal">0</span></p><button onclick="rollTwoDice()">Roll</button><div class="game-output" id="diceSumResult">Sum.</div>` },
+
+            // ROW 6 (Game 51-60)
+            { id: 51, title: 'Roman Numeral', html: `<h2>51. Roman Numeral</h2><input type="number" id="romanInput" placeholder="1-100"><button onclick="convertToRoman()">Convert</button><div class="game-output" id="romanResult">Result.</div>` },
+            { id: 52, title: 'Area Calc (Rect)', html: `<h2>52. Area Calc (Rect)</h2><input type="number" id="lenInput" placeholder="Length (L)"><input type="number" id="widInput" placeholder="Width (W)"><button onclick="calcArea()">Calculate Area</button><div class="game-output" id="areaResult">Area: 0</div>` },
+            { id: 53, title: 'Button Order (Custom)', html: `<h2>53. Button Order (Custom)</h2><p>Steps: <input type="number" id="orderSteps" value="3" min="2" max="5" style="width:100px;"></p><div class="controls" id="orderButtons"></div><div class="game-output" id="orderResult">Start with 1.</div>` },
+            { id: 54, title: 'Random Name Gen', html: `<h2>54. Random Name</h2><button onclick="generateName()">Generate</button><div class="game-output" id="nameResult">N/A</div>` },
+            { id: 55, title: 'Multi-Counter', html: `<h2>55. Multi-Counter</h2><p>X: <span id="c1">0</span> | Y: <span id="c2">0</span></p><div class="controls"><button onclick="incC1()">+X</button><button onclick="incC2()">+Y</button></div><div class="game-output">Waste management.</div>` },
+            { id: 56, title: 'Day of Week', html: `<h2>56. Day of Week</h2><input type="number" id="dayIndex" placeholder="1 (Mon) - 7 (Sun)"><button onclick="getDayName()">Get Day</button><div class="game-output" id="dayResult">N/A</div>` },
+            { id: 57, title: 'Word Length Filter', html: `<h2>57. Word Length Filter</h2><p>Min Len: <input type="number" id="filterMinLen" value="4" min="1" style="width:100px;"></p><input type="text" id="filterInput" placeholder="Words, separated, by, comma"><button onclick="filterWords()">Filter</button><div class="game-output" id="filterResult"></div>` },
+            { id: 58, title: 'Epoch Time Check', html: `<h2>58. Epoch Time Check</h2><button onclick="getEpoch()">Get Epoch</button><div class="game-output" id="epochResult">Seconds since 1970.</div>` },
+            { id: 59, title: 'Sentence Case', html: `<h2>59. Sentence Case</h2><input type="text" id="sentenceInput" placeholder="A sentence to convert."><button onclick="toSentenceCase()">Convert</button><div class="game-output" id="sentenceResult"></div>` },
+            { id: 60, title: 'Even/Odd Prediction', html: `<h2>60. Even/Odd Prediction</h2><p>Max Range: <input type="number" id="predictMax" value="100" min="10" style="width:100px;"></p><div class="controls"><button onclick="predictEvenOdd('Even')">Predict Even</button><button onclick="predictEvenOdd('Odd')">Predict Odd</button></div><div class="game-output" id="predictResult">Your prediction.</div>` },
+
+            // ROW 7 (Game 61-70)
+            { id: 61, title: 'Dice Roll History', html: `<h2>61. Dice Roll History</h2><p>Max Hist: <input type="number" id="historyMax" value="5" min="1" max="10" style="width:100px;"></p><p id="diceHist">Rolls: </p><button onclick="trackDiceHistory()">Roll D6</button><div class="game-output" id="historyResult"></div>` },
+            { id: 62, title: 'Button Masher', html: `<h2>62. Button Masher</h2><p>Presses: <span id="mashCount">0</span></p><button onclick="mashButton()">Mash!</button><div class="game-output">How fast?</div>` },
+            { id: 63, title: 'Color Fader (Custom)', html: `<h2>63. Color Fader (Custom)</h2><p>Speed (ms): <input type="number" id="fadeSpeed" value="100" min="10" style="width:100px;"></p><div id="fadeBox" style="height: 30px; background: #FF0000; transition: background-color 0.1s;"></div><button onclick="startFading()">Start Fade</button><div class="game-output" id="fadeResult">Fading...</div>` },
+            { id: 64, title: 'Number Sorter', html: `<h2>64. Number Sorter</h2><input type="text" id="sortInput" placeholder="5, 1, 3, 8"><div class="controls"><button onclick="sortNumbers('asc')">Ascending</button><button onclick="sortNumbers('desc')">Descending</button></div><div class="game-output" id="sortResult">Sorted.</div>` },
+            { id: 65, title: 'Time Until Reset', html: `<h2>65. Time Until Reset</h2><p>Duration (s): <input type="number" id="resetDuration" value="60" min="10" style="width:100px;"></p><p id="resetTime" style="font-size:1.8em;">60s</p><button onclick="startResetTimer()">Start</button><div class="game-output" id="resetMessage">Countdown.</div>` },
+            { id: 66, title: 'Simple Blackjack', html: `<h2>66. Simple Blackjack</h2><p>Target: <input type="number" id="bjTarget" value="21" min="18" max="25" style="width:100px;"></p><p>Current Total: <span id="bjTotal">0</span></p><div class="controls"><button onclick="hitBlackjack()">Hit</button><button onclick="resetBlackjack()">Reset</button></div><div class="game-output" id="bjResult">Draw cards.</div>` },
+            { id: 67, title: 'Reverse Click', html: `<h2>67. Reverse Click</h2><p>Start Value: <input type="number" id="revStart" value="10" min="1" style="width:100px;"></p><p>Target: <span id="revTarget" style="font-size:1.8em;">10</span></p><button onclick="reverseClick()">Click Down</button><div class="game-output" id="revResult">Count to 0.</div>` },
+            { id: 68, title: 'Word Replacer', html: `<h2>68. Word Replacer</h2><p>Old: <input type="text" id="replaceOld" value="the" style="width:80px;"> New: <input type="text" id="replaceNew" value="***" style="width:80px;"></p><input type="text" id="replaceInput" placeholder="Sentence to modify"><button onclick="replaceWord()">Replace</button><div class="game-output" id="replaceResult"></div>` },
+            { id: 69, title: 'Unit Converter', html: `<h2>69. Unit Converter</h2><input type="number" id="unitInput" placeholder="Value"><div class="controls"><button onclick="convertUnits('kmToMi')">km → mi</button><button onclick="convertUnits('miToKm')">mi → km</button></div><div class="game-output" id="unitResult">Result.</div>` },
+            { id: 70, title: 'Random Emoji', html: `<h2>70. Random Emoji</h2><button onclick="generateEmoji()">Get Emoji</button><div class="game-output" id="emojiResult" style="font-size: 2em;">N/A</div>` },
+
+            // ROW 8 (Game 71-80)
+            { id: 71, title: 'Secret Phrase', html: `<h2>71. Secret Phrase</h2><p>Hint: All CAPS, two words.</p><input type="text" id="phraseInput" placeholder="Guess Phrase"><button onclick="checkPhrase()">Check</button><div class="game-output" id="phraseResult">Try to guess.</div>` },
+            { id: 72, title: 'Color Mixer 2 (RGB)', html: `<h2>72. Color Mixer 2 (RGB)</h2><input type="number" id="rInput" placeholder="R (0-255)"><input type="number" id="gInput" placeholder="G (0-255)"><input type="number" id="bInput" placeholder="B (0-255)"><button onclick="showRgbColor()">Show</button><div class="game-output"><div id="rgbBox" style="height: 30px; width: 100%;"></div></div>` },
+            { id: 73, title: 'Letter Remover', html: `<h2>73. Letter Remover (Custom)</h2><p>Position (0=First): <input type="number" id="removePos" value="0" min="0" style="width:100px;"></p><input type="text" id="removeInput" placeholder="Text"><button onclick="removeFirstLetter()">Remove</button><div class="game-output" id="removeResult"></div>` },
+            { id: 74, title: 'Dice Roll Multiplier', html: `<h2>74. Dice Roll Multiplier</h2><p>Sides: <input type="number" id="multSides" value="6" min="2" style="width:100px;"></p><p>Running Score: <span id="multScore">0</span></p><button onclick="rollAndMultiply()">Roll & Multiply</button><div class="game-output" id="multResult">Roll 2 dice.</div>` },
+            { id: 75, title: 'Mood Tracker', html: `<h2>75. Mood Tracker</h2><button onclick="changeMood()">Change Mood</button><div class="game-output" id="moodDisplay">Neutral</div>` },
+            { id: 76, title: 'Input Mirror', html: `<h2>76. Input Mirror</h2><input type="text" id="mirrorInput" placeholder="Mirror This"><div class="game-output" id="mirrorResult"></div>` },
+            { id: 77, title: 'Random Integer', html: `<h2>77. Random Integer (Custom)</h2><p>Max Value: <input type="number" id="randMax" value="1000" min="10" style="width:100px;"></p><button onclick="getLargeRandom()">Generate</button><div class="game-output" id="largeRandomResult">N/A</div>` },
+            { id: 78, title: 'Word Counter', html: `<h2>78. Word Counter</h2><input type="text" id="wordCountInput" placeholder="Enter words separated by space"><button onclick="countWords()">Count Words</button><div class="game-output" id="wordCountResult">Words: 0</div>` },
+            { id: 79, title: 'Time of Day Guess', html: `<h2>79. Time of Day Guess</h2><button onclick="checkTimeGuess()">Guess AM/PM</button><div class="game-output" id="timeGuessResult">Guess now.</div>` },
+            { id: 80, title: 'Sequential Clicker', html: `<h2>80. Sequential Clicker</h2><p>Sequence Length: <input type="number" id="seqLen" value="3" min="2" max="5" style="width:100px;"></p><p>Next Target: <span id="seqTarget">1</span></p><div class="controls" id="seqButtons"></div><div class="game-output" id="seqResult">Sequence.</div>` },
+
+            // ROW 9 (Games 81-90)
+            { id: 81, title: 'Button Swap (Custom)', html: `<h2>81. Button Swap (Custom)</h2><p>Target: <span id="swapTarget" style="font-size:1.5em;">A</span></p><div class="controls"><button id="swapA" onclick="swapClick('A')">A</button><button id="swapB" onclick="swapClick('B')">B</button></div><div class="game-output" id="swapResult">Find the target.</div>` },
+            { id: 82, title: 'Day Number', html: `<h2>82. Day Number</h2><button onclick="getDayNumber()">Get Day #</button><div class="game-output" id="dayNumResult">Day 1-365</div>` },
+            { id: 83, title: 'Simple Inventory Craft', html: `<h2>83. Simple Inventory Craft</h2><p>Cost (W/S): <input type="number" id="craftCost" value="5" min="1" style="width:100px;"></p><p>Wood: <span id="invWood">10</span> | Stone: <span id="invStone">10</span></p><button onclick="craftItem()">Craft Item</button><div class="game-output" id="craftResult">Items: 0</div>` },
+            { id: 84, title: 'Text Repetition', html: `<h2>84. Text Repetition</h2><p>Times: <input type="number" id="repeatCount" value="3" min="1" max="10" style="width:100px;"></p><input type="text" id="repeatInput" placeholder="Word or text"><button onclick="repeatText()">Repeat</button><div class="game-output" id="repeatResult"></div>` },
+            { id: 85, title: 'Random Case', html: `<h2>85. Random Case</h2><input type="text" id="caseInput" placeholder="Text to modify"><button onclick="randomCase()">Random Case</button><div class="game-output" id="caseResult"></div>` },
+            { id: 86, title: 'Trivial Geometry', html: `<h2>86. Trivial Geometry</h2><input type="number" id="sideInput" placeholder="Side Length"><button onclick="calcPerimeter()">Perimeter (Square)</button><div class="game-output" id="geomResult">P: 0</div>` },
+            { id: 87, title: 'Input Hide/Show', html: `<h2>87. Input Hide/Show</h2><input type="text" id="hideInput" placeholder="Secret Text" style="display:none;"><button onclick="toggleInput()">Toggle Input</button><div class="game-output" id="hideResult">Hidden.</div>` },
+            { id: 88, title: 'Number Square Root', html: `<h2>88. Number Square Root</h2><input type="number" id="sqrtInput" placeholder="Number"><button onclick="calculateSqrt()">Calculate √</button><div class="game-output" id="sqrtResult">√: N/A</div>` },
+            { id: 89, title: 'Sentence Length', html: `<h2>89. Sentence Length</h2><input type="text" id="sentenceLenInput" placeholder="Sentence"><button onclick="checkSentenceLength()">Check Length</button><div class="game-output" id="sentenceLenResult"></div>` },
+            { id: 90, title: 'Random Wait Timer', html: `<h2>90. Random Wait Timer</h2><p>Max Wait (s): <input type="number" id="waitMax" value="3" min="1" style="width:100px;"></p><p id="waitTimerDisplay" style="font-size:1.5em;">Ready</p><button onclick="startRandomWait()">Wait Random</button><div class="game-output" id="waitResult">Click start.</div>` },
+
+            // ROW 10 (Games 91-100)
+            { id: 91, title: 'Binary Flip', html: `<h2>91. Binary Flip</h2><p>Bits (2-8): <input type="number" id="binaryBits" value="4" min="2" max="8" style="width:100px;"></p><p id="binaryFlip" style="font-size:1.8em;">0000</p><button onclick="flipBit()">Flip Random Bit</button><div class="game-output">Change the bits.</div>` },
+            { id: 92, title: 'Number to Word', html: `<h2>92. Number to Word</h2><input type="number" id="numToWordInput" placeholder="1-10"><button onclick="numToWord()">Convert</button><div class="game-output" id="numToWordResult"></div>` },
+            { id: 93, title: 'Random Punctuation', html: `<h2>93. Random Punctuation</h2><input type="text" id="puncInput" placeholder="Text"><button onclick="addPunctuation()">Add Punct.</button><div class="game-output" id="puncResult"></div>` },
+            { id: 94, title: 'Alphabet Position', html: `<h2>94. Alphabet Position</h2><input type="text" id="alphaInput" maxlength="1" placeholder="Letter (A-Z)"><button onclick="getAlphaPosition()">Get Pos</button><div class="game-output" id="alphaResult">1-26</div>` },
+            { id: 95, title: 'Click Color Change', html: `<h2>95. Click Color Change</h2><div id="clickColorBox" style="height: 30px; background: #333; margin-bottom: 10px;"></div><button onclick="changeClickColor()">Change Box</button><div class="game-output">Endless hues.</div>` },
+            { id: 96, title: 'Simple Budget', html: `<h2>96. Simple Budget</h2><p>Start Cash: <input type="number" id="budgetStart" value="100" min="10" style="width:100px;"></p><p>Cash: <span id="budgetCash">100</span></p><div class="controls"><button onclick="spendMoney()">Spend (-10)</button><button onclick="earnMoney()">Earn (+5)</button></div><div class="game-output" id="budgetResult">Financial ruin.</div>` },
+            { id: 97, title: 'Odd Number Check', html: `<h2>97. Odd Number Check</h2><input type="number" id="oddCheckInput" placeholder="Number"><button onclick="checkOdd()">Is Odd?</button><div class="game-output" id="oddCheckResult">Yes/No</div>` },
+            { id: 98, title: 'Multi-Step Quiz (Custom)', html: `<h2>98. Multi-Step Quiz (Custom)</h2><p id="multiQuizQ">Q1</p><div class="controls"><button onclick="nextQuizStep('A')">A (Yes)</button><button onclick="nextQuizStep('B')">B (No)</button></div><div class="game-output" id="multiQuizResult">Step 1/3</div>` },
+            { id: 99, title: 'Simple Timer (Custom)', html: `<h2>99. Simple Timer (Custom)</h2><p>Duration (s): <input type="number" id="simpleDuration" value="10" min="1" style="width:100px;"></p><p id="simpleTimer" style="font-size:1.8em;">10s</p><button onclick="startSimpleTimer()">Start</button><div class="game-output" id="simpleTimerResult">Time left.</div>` },
+            { id: 100, title: 'Ultimate Counter', html: `<h2>100. Ultimate Counter</h2><p>Increment: <input type="number" id="incrementRate" value="1" min="1" style="width:100px;"></p><p>Count: <span id="ultimateCount" style="font-size:1.8em;">0</span></p><button onclick="incrementUltimate()">Count</button><div class="game-output">The final click.</div>` },
+        ];
+
+
+        // =========================================================
+        // SPA LOGIC AND NAVIGATION
+        // =========================================================
+
+        let activeGameId = null;
+        const gameArea = document.getElementById('gameArea');
+        const mainMenu = document.getElementById('mainMenu');
+        let gameIntervals = []; // To store and clear intervals/timeouts
+
+        function initializeWaster() {
+            renderMainMenu();
+        }
+
+        function renderMainMenu() {
+            mainMenu.innerHTML = GAMES_DATA.map(game => 
+                `<button id="menu-btn-${game.id}" onclick="loadGame(${game.id})">${game.id}. ${game.title}</button>`
+            ).join('');
+        }
+
+        window.loadGame = function(id) {
+            // 1. Clean up old game state
+            clearActiveGame();
+
+            // 2. Load new game HTML
+            const gameData = GAMES_DATA.find(g => g.id === id);
+            if (!gameData) return;
+
+            gameArea.innerHTML = `<div class="game-display">${gameData.html}</div>`;
+            activeGameId = id;
+            
+            // 3. Highlight menu button
+            document.querySelectorAll('#mainMenu button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`menu-btn-${id}`).classList.add('active');
+
+            // 4. Initialize specific JS logic
+            initializeGameLogic(id);
+        };
+
+        function clearActiveGame() {
+            // Clear all intervals/timeouts registered by the previous game
+            gameIntervals.forEach(clearInterval);
+            gameIntervals = [];
+            
+            // Clear specific global timers for robustness if they weren't caught by registerInterval
+            if (typeof stopwatchInterval !== 'undefined' && stopwatchInterval !== null) { clearInterval(stopwatchInterval); stopwatchInterval = null; running = false; }
+            if (typeof fadeInterval !== 'undefined' && fadeInterval !== null) clearInterval(fadeInterval);
+            if (typeof wasteTimerInterval !== 'undefined' && wasteTimerInterval !== null) clearInterval(wasteTimerInterval);
+            if (typeof countdownInterval !== 'undefined' && countdownInterval !== null) clearInterval(countdownInterval);
+            if (typeof resetTimer !== 'undefined' && resetTimer !== null) clearInterval(resetTimer);
+            if (typeof waitTimerInterval !== 'undefined' && waitTimerInterval !== null) clearInterval(waitTimerInterval);
+            if (typeof simpleTimerInterval !== 'undefined' && simpleTimerInterval !== null) clearInterval(simpleTimerInterval);
+            if (typeof craftTimer !== 'undefined' && craftTimer !== null) clearInterval(craftTimer);
+            
+            activeGameId = null;
+        }
+        
+        // Helper to register intervals/timeouts for cleanup
+        function registerInterval(interval) {
+            gameIntervals.push(interval);
+        }
+
+        // =========================================================
+        // UTILITY FUNCTIONS (Must remain global/accessible)
+        // =========================================================
+        function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+        function hexToRgb(hex) { const bigint = parseInt(hex.slice(1), 16); return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255]; }
+        function rgbToHex(r, g, b) { r = Math.min(255, Math.max(0, Math.round(r))); g = Math.min(255, Math.max(0, Math.round(g))); b = Math.min(255, Math.max(0, Math.round(b))); return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase(); }
+
+
+        // =========================================================
+        // GAME LOGIC INITIALIZATION FUNCTIONS (1-100)
+        // =========================================================
+
+        function initializeGameLogic(id) {
+            switch(id) {
+                case 1: init_game_01(); break;
+                case 2: init_game_02(); break;
+                case 3: init_game_03(); break;
+                case 4: init_game_04(); break;
+                case 5: init_game_05(); break;
+                case 6: init_game_06(); break;
+                case 7: init_game_07(); break;
+                case 8: init_game_08(); break;
+                case 9: init_game_09(); break;
+                case 10: init_game_10(); break;
+                case 11: init_game_11(); break;
+                case 12: init_game_12(); break;
+                case 13: init_game_13(); break;
+                case 14: init_game_14(); break;
+                case 15: init_game_15(); break;
+                case 16: init_game_16(); break;
+                case 17: init_game_17(); break;
+                case 18: init_game_18(); break;
+                case 19: init_game_19(); break;
+                case 20: init_game_20(); break;
+                case 21: init_game_21(); break;
+                case 22: init_game_22(); break;
+                case 23: init_game_23(); break;
+                case 24: init_game_24(); break;
+                case 25: init_game_25(); break;
+                case 26: init_game_26(); break;
+                case 27: init_game_27(); break;
+                case 28: init_game_28(); break;
+                case 29: init_game_29(); break;
+                case 30: init_game_30(); break;
+                case 31: init_game_31(); break;
+                case 32: init_game_32(); break;
+                case 33: init_game_33(); break;
+                case 34: init_game_34(); break;
+                case 35: init_game_35(); break;
+                case 36: init_game_36(); break;
+                case 37: init_game_37(); break;
+                case 38: init_game_38(); break;
+                case 39: init_game_39(); break;
+                case 40: init_game_40(); break;
+                case 41: init_game_41(); break;
+                case 42: init_game_42(); break;
+                case 43: init_game_43(); break;
+                case 44: init_game_44(); break;
+                case 45: init_game_45(); break;
+                case 46: init_game_46(); break;
+                case 47: init_game_47(); break;
+                case 48: init_game_48(); break;
+                case 49: init_game_49(); break;
+                case 50: init_game_50(); break;
+                case 51: init_game_51(); break;
+                case 52: init_game_52(); break;
+                case 53: init_game_53(); break;
+                case 54: init_game_54(); break;
+                case 55: init_game_55(); break;
+                case 56: init_game_56(); break;
+                case 57: init_game_57(); break;
+                case 58: init_game_58(); break;
+                case 59: init_game_59(); break;
+                case 60: init_game_60(); break;
+                case 61: init_game_61(); break;
+                case 62: init_game_62(); break;
+                case 63: init_game_63(); break;
+                case 64: init_game_64(); break;
+                case 65: init_game_65(); break;
+                case 66: init_game_66(); break;
+                case 67: init_game_67(); break;
+                case 68: init_game_68(); break;
+                case 69: init_game_69(); break;
+                case 70: init_game_70(); break;
+                case 71: init_game_71(); break;
+                case 72: init_game_72(); break;
+                case 73: init_game_73(); break;
+                case 74: init_game_74(); break;
+                case 75: init_game_75(); break;
+                case 76: init_game_76(); break;
+                case 77: init_game_77(); break;
+                case 78: init_game_78(); break;
+                case 79: init_game_79(); break;
+                case 80: init_game_80(); break;
+                case 81: init_game_81(); break;
+                case 82: init_game_82(); break;
+                case 83: init_game_83(); break;
+                case 84: init_game_84(); break;
+                case 85: init_game_85(); break;
+                case 86: init_game_86(); break;
+                case 87: init_game_87(); break;
+                case 88: init_game_88(); break;
+                case 89: init_game_89(); break;
+                case 90: init_game_90(); break;
+                case 91: init_game_91(); break;
+                case 92: init_game_92(); break;
+                case 93: init_game_93(); break;
+                case 94: init_game_94(); break;
+                case 95: init_game_95(); break;
+                case 96: init_game_96(); break;
+                case 97: init_game_97(); break;
+                case 98: init_game_98(); break;
+                case 99: init_game_99(); break;
+                case 100: init_game_100(); break;
+            }
+        }
+
+
+        // =========================================================
+        // GAME IMPLEMENTATIONS (1-100)
+        // =========================================================
+
+        // --- 1. RPS (Clicker) ---
+        let rpsPlayerScore = 0; let rpsCompScore = 0;
+        const rpsChoices = ['Rock', 'Paper', 'Scissors'];
+        function init_game_01() {
+            rpsPlayerScore = 0; rpsCompScore = 0;
+            document.getElementById('rpsPlayerScore').textContent = 0;
+            document.getElementById('rpsCompScore').textContent = 0;
+            document.getElementById('rpsResult').textContent = "Choose.";
+        }
+        window.playRPS = function (playerChoice) {
+            const computerChoice = getRandomElement(rpsChoices);
+            const rpsResult = document.getElementById('rpsResult');
+            let message = `${playerChoice} vs ${computerChoice}. `;
+            if (playerChoice === computerChoice) { message += "Draw!"; }
+            else if ((playerChoice === 'Rock' && computerChoice === 'Scissors') || (playerChoice === 'Paper' && computerChoice === 'Rock') || (playerChoice === 'Scissors' && computerChoice === 'Paper')) { rpsPlayerScore++; message += "You Win!"; }
+            else { rpsCompScore++; message += "Comp Wins."; }
+            document.getElementById('rpsPlayerScore').textContent = rpsPlayerScore;
+            document.getElementById('rpsCompScore').textContent = rpsCompScore;
+            rpsResult.textContent = message;
+        };
+
+        // --- 2. Number Guessing Game (Custom) ---
+        let secretNumber, attemptsLeft;
+        const initialAttempts = 5;
+        function init_game_02() { window.initializeGuessGame(); }
+        window.initializeGuessGame = function() {
+            const guessRangeInput = document.getElementById('guessRange');
+            const maxRange = parseInt(guessRangeInput.value) || 100;
+            secretNumber = Math.floor(Math.random() * maxRange) + 1;
+            attemptsLeft = initialAttempts;
+            document.getElementById('guessAttempts').textContent = attemptsLeft;
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessResult').textContent = `New number (1-${maxRange}).`;
+        };
+        window.checkGuess = function () {
+            if (attemptsLeft <= 0) return;
+            const guessRangeInput = document.getElementById('guessRange');
+            const guessInput = document.getElementById('guessInput');
+            const guessResult = document.getElementById('guessResult');
+            const userGuess = parseInt(guessInput.value);
+            const maxRange = parseInt(guessRangeInput.value) || 100;
+            if (isNaN(userGuess) || userGuess < 1 || userGuess > maxRange) { guessResult.textContent = `Invalid (1-${maxRange}).`; return; }
+            attemptsLeft--;
+            document.getElementById('guessAttempts').textContent = attemptsLeft;
+            if (userGuess === secretNumber) { guessResult.textContent = `SUCCESS! (${secretNumber})`; guessInput.disabled = true; } 
+            else if (attemptsLeft === 0) { guessResult.textContent = `Game Over! Was ${secretNumber}.`; } 
+            else if (userGuess < secretNumber) { guessResult.textContent = "Too low."; } 
+            else { guessResult.textContent = "Too high."; }
+        };
+
+        // --- 3. Reaction Time Tester (Custom) ---
+        let waitingForGreen = false; let startTime = 0; let timeoutId; let bestTime = Infinity;
+        function init_game_03() { 
+            bestTime = Infinity; 
+            document.getElementById('bestTime').textContent = 'N/A';
+            document.getElementById('reactionButton').textContent = "Start Test";
+            document.getElementById('reactionTimeResult').textContent = "Wait for green.";
+        }
+        window.handleReactionClick = function () {
+            const reactionButton = document.getElementById('reactionButton');
+            const reactionResult = document.getElementById('reactionTimeResult');
+            const reactionMaxDelayInput = document.getElementById('reactionMaxDelay');
+            const bestTimeDisplay = document.getElementById('bestTime');
+            if (reactionButton.textContent === "Start Test") {
+                reactionButton.textContent = "Wait...";
+                waitingForGreen = true;
+                reactionResult.textContent = "Waiting for green light...";
+                const maxDelay = parseInt(reactionMaxDelayInput.value) || 3000;
+                const delay = Math.random() * (maxDelay - 500) + 500;
+                timeoutId = setTimeout(goGreen, delay);
+                registerInterval(timeoutId); // Register the timeout for potential clearing
+            } else if (waitingForGreen) {
+                clearTimeout(timeoutId);
+                reactionResult.textContent = "Too soon! Restart.";
+                reactionButton.textContent = "Start Test";
+                waitingForGreen = false;
+            } else if (reactionButton.textContent === "CLICK NOW!") {
+                const reactionTime = Math.round(performance.now() - startTime);
+                if (reactionTime < bestTime) { bestTime = reactionTime; bestTimeDisplay.textContent = `${bestTime} ms (RECORD!)`; }
+                reactionResult.textContent = `Time: ${reactionTime} ms`;
+                reactionButton.textContent = "Start Test";
+            }
+        };
+        function goGreen() {
+            const reactionButton = document.getElementById('reactionButton');
+            if (waitingForGreen) { reactionButton.textContent = "CLICK NOW!"; startTime = performance.now(); waitingForGreen = false; }
+        }
+
+        // --- 4. Coin Flip (Custom) ---
+        let coinFlips = 0; let coinHeads = 0;
+        function init_game_04() { coinFlips = 0; coinHeads = 0; document.getElementById('coinHeads').textContent = 0; document.getElementById('coinResult').textContent = "Ready."; }
+        window.flipCoin = function () {
+            const coinBiasInput = document.getElementById('coinBias');
+            const bias = parseInt(coinBiasInput.value) / 100 || 0.5;
+            const result = Math.random() < bias ? 'Heads' : 'Tails';
+            coinFlips++;
+            if (result === 'Heads') coinHeads++;
+            document.getElementById('coinHeads').textContent = coinHeads;
+            document.getElementById('coinResult').textContent = `Result: ${result}. Total Flips: ${coinFlips}`;
+        };
+
+        // --- 5. Dice Roller (D-Custom) ---
+        let diceRolls = 0;
+        function init_game_05() { diceRolls = 0; document.getElementById('diceRolls').textContent = 0; document.getElementById('diceResult').textContent = "Roll."; }
+        window.rollDice = function () {
+            const diceSidesInput = document.getElementById('diceSides');
+            const sides = parseInt(diceSidesInput.value) || 6;
+            const roll = Math.floor(Math.random() * sides) + 1;
+            diceRolls++;
+            document.getElementById('diceRolls').textContent = diceRolls;
+            document.getElementById('diceResult').textContent = `Rolled a ${roll} (D${sides}).`;
+        };
+        
+        // --- 6. Magic 8-Ball ---
+        const eightBallResponses = ["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."];
+        function init_game_06() { document.getElementById('eightBallResult').textContent = "Query."; document.getElementById('eightBallQuestion').value = ''; }
+        window.askEightBall = function () {
+            const eightBallQuestion = document.getElementById('eightBallQuestion');
+            const eightBallResult = document.getElementById('eightBallResult');
+            if (eightBallQuestion.value.trim() === "") { eightBallResult.textContent = "Ask a question first!"; return; }
+            eightBallResult.textContent = getRandomElement(eightBallResponses);
+            eightBallQuestion.value = "";
+        };
+
+        // --- 7. Simple Incremental Clicker (Custom Rate) ---
+        let clickerScore = 0;
+        function init_game_07() { clickerScore = 0; document.getElementById('clickerScore').textContent = 0; }
+        window.increaseClicker = function () { 
+            const rate = parseInt(document.getElementById('clickRate').value) || 1;
+            clickerScore += rate; 
+            document.getElementById('clickerScore').textContent = clickerScore.toLocaleString(); 
+        };
+        window.resetClicker = function () { clickerScore = 0; document.getElementById('clickerScore').textContent = 0; };
+
+        // --- 8. High/Low Card Game ---
+        let currentCardValue;
+        const cardLabels = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K' };
+        function getCardLabel(value) { return cardLabels[value] || value; }
+        function init_game_08() { 
+            currentCardValue = Math.floor(Math.random() * 13) + 1;
+            document.getElementById('currentCard').textContent = getCardLabel(currentCardValue);
+            document.getElementById('cardResult').textContent = "Guess next.";
+        }
+        window.playCardGuess = function (guess) {
+            const nextCardValue = Math.floor(Math.random() * 13) + 1;
+            let resultMessage = "";
+            if (nextCardValue === currentCardValue) { resultMessage = `${getCardLabel(nextCardValue)}. Draw!`; }
+            else if ((nextCardValue > currentCardValue && guess === 'High') || (nextCardValue < currentCardValue && guess === 'Low')) { resultMessage = `${getCardLabel(nextCardValue)}. Correct!`; } 
+            else { resultMessage = `${getCardLabel(nextCardValue)}. Wrong!`; }
+            currentCardValue = nextCardValue;
+            document.getElementById('currentCard').textContent = getCardLabel(currentCardValue);
+            document.getElementById('cardResult').textContent = resultMessage;
+        };
+
+        // --- 9. Random Password Generator (Custom) ---
+        function init_game_09() { document.getElementById('passwordResult').textContent = "Click."; }
+        window.generatePassword = function () {
+            const length = parseInt(document.getElementById('pwdLength').value) || 8;
+            const chkSymbols = document.getElementById('chkSymbols');
+            let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            if (chkSymbols.checked) chars += "!@#$%^&*()_+";
+            if (length < 4 || length > 20 || chars.length === 0) { document.getElementById('passwordResult').textContent = "Error: Invalid settings."; return; }
+            let password = "";
+            for (let i = 0; i < length; i++) { password += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            document.getElementById('passwordResult').textContent = password;
+        };
+
+        // --- 10. Door Selector (Custom) ---
+        const doorPrizes = ["Sand", "Disappointment", "Key", "Lint", "New Game", "Free Loot Box"];
+        
+        function init_game_10() { 
+            const numDoorsInput = document.getElementById('numDoors');
+            numDoorsInput.onchange = () => renderDoorButtons_10(true); // Attach reset listener
+            renderDoorButtons_10(true); // Initial render
+        }
+        
+        function renderDoorButtons_10(enable) {
+            const numDoorsInput = document.getElementById('numDoors');
+            const doorButtonsContainer = document.getElementById('doorButtons');
+            const numDoors = parseInt(numDoorsInput.value) || 3;
+            doorButtonsContainer.innerHTML = '';
+
+            for (let i = 1; i <= numDoors; i++) {
+                const button = document.createElement('button');
+                button.textContent = `Door ${i}`;
+                button.disabled = !enable; // Disable if enable is false
+                button.onclick = () => window.chooseDoor(i);
+                doorButtonsContainer.appendChild(button);
+            }
+
+            if (enable) {
+                document.getElementById('doorResult').textContent = "Pick a door.";
+            }
+        }
+
+        window.chooseDoor = function (doorNum) {
+            const numDoors = parseInt(document.getElementById('numDoors').value) || 3;
+            const winningDoor = Math.floor(Math.random() * numDoors) + 1;
+            
+            // 1. Determine result
+            if (doorNum === winningDoor) { 
+                document.getElementById('doorResult').textContent = `Door ${doorNum}: WINNER! ${getRandomElement(doorPrizes)}.`; 
+            } else { 
+                document.getElementById('doorResult').textContent = `Door ${doorNum} was empty. The prize was behind Door ${winningDoor}.`; 
+            }
+            
+            // 2. Disable all doors for this round
+            const doorButtonsContainer = document.getElementById('doorButtons');
+            Array.from(doorButtonsContainer.children).forEach(btn => btn.disabled = true);
+            
+            // 3. Re-enable the buttons after a short delay so the user can see the result, but rely on input change for reset (better UX)
+            setTimeout(() => {
+                document.getElementById('doorResult').textContent += " Change door count above to reset.";
+            }, 1000);
+        };
+
+        // --- 11. Trivial Math Quiz ---
+        let currentAnswer = 0;
+        function init_game_11() { generateMathQuestion(); }
+        function generateMathQuestion() {
+            const mathQuestionDisplay = document.getElementById('mathQuestion');
+            const num1 = Math.floor(Math.random() * 10) + 1;
+            const num2 = Math.floor(Math.random() * 10) + 1;
+            const operator = Math.random() < 0.5 ? '+' : '-';
+            if (operator === '+') { currentAnswer = num1 + num2; mathQuestionDisplay.textContent = `${num1} + ${num2} = ?`; } 
+            else { currentAnswer = Math.abs(num1 - num2); mathQuestionDisplay.textContent = `${Math.max(num1, num2)} - ${Math.min(num1, num2)} = ?`; }
+            document.getElementById('mathAnswer').value = '';
+            document.getElementById('mathResult').textContent = "Solve.";
+        }
+        window.submitMathAnswer = function () {
+            const mathAnswerInput = document.getElementById('mathAnswer');
+            const mathResult = document.getElementById('mathResult');
+            const userAnswer = parseInt(mathAnswerInput.value);
+            if (userAnswer === currentAnswer) { mathResult.textContent = "Correct! New Q."; generateMathQuestion(); } 
+            else { mathResult.textContent = "Incorrect."; }
+        };
+
+        // --- 12. Vowel/Consonant Counter ---
+        function init_game_12() { document.getElementById('countResult').textContent = "Vowels: 0 | Consonants: 0"; document.getElementById('textInput').value = ''; }
+        window.countLetters = function () {
+            const text = document.getElementById('textInput').value.toLowerCase().replace(/[^a-z]/g, "");
+            let vowels = 0; let consonants = 0;
+            for (const char of text) { if ('aeiou'.includes(char)) { vowels++; } else { consonants++; } }
+            document.getElementById('countResult').textContent = `Vowels: ${vowels} | Consonants: ${consonants}`;
+        };
+
+        // --- 13. Simple Inventory Clicker ---
+        let resourceGems = 0; let resourceOre = 0;
+        function init_game_13() { resourceGems = 0; resourceOre = 0; document.getElementById('resourceGems').textContent = 0; document.getElementById('resourceOre').textContent = 0; document.getElementById('resourceResult').textContent = "Mine."; }
+        window.collectResource = function (type) {
+            const amount = Math.floor(Math.random() * 3) + 1;
+            if (type === 'Gem') { resourceGems += amount; document.getElementById('resourceGems').textContent = resourceGems; document.getElementById('resourceResult').textContent = `+${amount} Gem.`; } 
+            else { resourceOre += amount; document.getElementById('resourceOre').textContent = resourceOre; document.getElementById('resourceResult').textContent = `+${amount} Ore.`; }
+        };
+
+        // --- 14. Stopwatch (Lap) ---
+        let stopwatchInterval; let running = false; let elapsedTime = 0;
+        function init_game_14() { window.resetStopwatch(); }
+        function formatTime(ms) {
+            const totalSeconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            const centiseconds = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
+            return `${minutes}:${seconds}.${centiseconds}`;
+        }
+        window.startStopwatch = function () {
+            const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+            const startStopwatchButton = document.getElementById('startStopwatch');
+            const lapStopwatchButton = document.getElementById('lapStopwatch');
+            if (!running) {
+                running = true;
+                startStopwatchButton.textContent = "Pause";
+                lapStopwatchButton.disabled = false;
+                const startTime = Date.now() - elapsedTime;
+                stopwatchInterval = setInterval(() => { elapsedTime = Date.now() - startTime; stopwatchDisplay.textContent = formatTime(elapsedTime); }, 10);
+                registerInterval(stopwatchInterval);
+            } else {
+                clearInterval(stopwatchInterval);
+                stopwatchInterval = null;
+                running = false;
+                startStopwatchButton.textContent = "Resume";
+                lapStopwatchButton.disabled = true;
+            }
+        };
+        window.lapStopwatch = function () {
+            if (running) {
+                const lapHistory = document.getElementById('lapHistory');
+                const lapTime = formatTime(elapsedTime);
+                lapHistory.innerHTML = `Lap: ${lapTime}<br>` + lapHistory.innerHTML;
+            }
+        };
+        window.resetStopwatch = function () {
+            clearInterval(stopwatchInterval); stopwatchInterval = null; running = false; elapsedTime = 0;
+            document.getElementById('stopwatchDisplay').textContent = "00:00.00"; 
+            document.getElementById('startStopwatch').textContent = "Start";
+            document.getElementById('lapHistory').innerHTML = ""; 
+            document.getElementById('lapStopwatch').disabled = true;
+        };
+
+        // --- 15. Quote Randomizer ---
+        const quotes = ["The only true wisdom is in knowing you know nothing.", "Life is what happens when you're busy making other plans.", "Eighty percent of success is showing up.", "Why put off till tomorrow what you can completely ignore?", "I am wasting time, therefore I am.", "A day wasted is not a wasted day if you enjoyed it."];
+        function init_game_15() { window.generateQuote(); }
+        window.generateQuote = function () { document.getElementById('quoteResult').textContent = getRandomElement(quotes); };
+
+        // --- 16. Heads or Tails Streak Tracker (Custom Prob) ---
+        let currentStreak = 0; let currentStreakSide = null;
+        function init_game_16() { currentStreak = 0; currentStreakSide = null; document.getElementById('streakCount').textContent = 0; document.getElementById('streakResult').textContent = "Beat the odds!"; }
+        window.flipStreak = function (playerGuess) {
+            const probability = parseInt(document.getElementById('flipProb').value) / 100 || 0.5;
+            const flip = Math.random() < probability ? 'Heads' : 'Tails';
+            if (flip === playerGuess) {
+                currentStreak = (flip === currentStreakSide) ? currentStreak + 1 : 1;
+                currentStreakSide = flip;
+                document.getElementById('streakResult').textContent = `It was ${flip}. Streak: ${currentStreak}`;
+            } else {
+                currentStreak = 0;
+                currentStreakSide = null;
+                document.getElementById('streakResult').textContent = `It was ${flip}. Streak broken.`;
+            }
+            document.getElementById('streakCount').textContent = currentStreak;
+        };
+
+        // --- 17. Choice Dilemma ---
+        function init_game_17() { document.getElementById('dilemmaResult').textContent = "Decision."; }
+        window.makeDilemmaChoice = function (choice) {
+            const outcome = Math.random() < 0.5 ? 'Correct' : 'Incorrect';
+            document.getElementById('dilemmaResult').textContent = `${choice} chosen. Result: ${outcome}.`;
+        };
+
+        // --- 18. Temperature Converter ---
+        function init_game_18() { document.getElementById('tempResult').textContent = "Result."; document.getElementById('tempInput').value = ''; }
+        window.convertTemp = function (mode) {
+            const value = parseFloat(document.getElementById('tempInput').value);
+            if (isNaN(value)) { document.getElementById('tempResult').textContent = "Invalid."; return; }
+            let converted;
+            if (mode === 'C') { converted = (value * 9/5) + 32; document.getElementById('tempResult').textContent = `${converted.toFixed(1)}°F`; } 
+            else { converted = (value - 32) * 5/9; document.getElementById('tempResult').textContent = `${converted.toFixed(1)}°C`; }
+        };
+
+        // --- 19. Character ASCII Value ---
+        function init_game_19() { document.getElementById('asciiResult').textContent = "Value: N/A"; document.getElementById('asciiInput').value = ''; }
+        window.getAsciiValue = function () {
+            const char = document.getElementById('asciiInput').value.trim();
+            if (char.length !== 1) { document.getElementById('asciiResult').textContent = "Enter 1 char."; return; }
+            document.getElementById('asciiResult').textContent = `Value: ${char.charCodeAt(0)}`;
+        };
+
+        // --- 20. Color Mixer (Hex) ---
+        function init_game_20() { 
+            document.getElementById('colorSelect1').value = '#ff0000';
+            document.getElementById('colorSelect2').value = '#00ff00';
+            window.mixColors(); 
+        }
+        window.mixColors = function () {
+            const colorSelect1 = document.getElementById('colorSelect1');
+            const colorSelect2 = document.getElementById('colorSelect2');
+            const mixedColorBox = document.getElementById('mixedColorBox');
+            const rgb1 = hexToRgb(colorSelect1.value);
+            const rgb2 = hexToRgb(colorSelect2.value);
+            const mixedHex = rgbToHex(Math.floor((rgb1[0] + rgb2[0]) / 2), Math.floor((rgb1[1] + rgb2[1]) / 2), Math.floor((rgb1[2] + rgb2[2]) / 2));
+            mixedColorBox.style.backgroundColor = mixedHex;
+        };
+
+        // --- 21. VISUAL OUIJA BOARD ---
+        let isOuijaActive = false;
+        let currentSpelledAnswer = "";
+        let currentQuestion = "";
+        const OUIIJA_TARGETS = [
+            'YES', 'NO', 'GOODBYE',
+            '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
+            'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+            'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'
+        ];
+
+        function init_game_21() { window.resetOuija(); }
+        
+        function getOuijaElementPosition(id) {
+            const el = document.getElementById(`o_${id}`);
+            const board = document.getElementById('ouijaBoardContainer');
+            if (!el || !board) return { x: 0, y: 0 };
+            
+            const boardRect = board.getBoundingClientRect();
+            const elRect = el.getBoundingClientRect();
+            
+            // Calculate center relative to the board container
+            const x = elRect.left + (elRect.width / 2) - boardRect.left;
+            const y = elRect.top + (elRect.height / 2) - boardRect.top;
+            
+            return { x, y };
+        }
+
+        function movePlanchette(targetId) {
+            const planchette = document.getElementById('planchette');
+            const pos = getOuijaElementPosition(targetId);
+            
+            // 13px is half the planchette size including borders (20px + 3px border * 2 = 26px total diameter)
+            planchette.style.transform = `translate(${pos.x - 13}px, ${pos.y - 13}px)`;
+        }
+
+        window.moveRandomly = function () {
+            const ouijaQuestion = document.getElementById('ouijaQuestion');
+            const currentOuijaAnswer = document.getElementById('currentOuijaAnswer');
+            const ouijaButton = document.getElementById('ouijaButton');
+            
+            if (!isOuijaActive) {
+                if (ouijaQuestion.value.trim().length < 5) {
+                    currentOuijaAnswer.innerHTML = "Please ask a thoughtful question (5+ chars) first.";
+                    return;
+                }
+                currentQuestion = ouijaQuestion.value.trim();
+                isOuijaActive = true;
+                ouijaQuestion.disabled = true;
+                ouijaButton.textContent = "Next Letter";
+                currentOuijaAnswer.innerHTML = `**Q:** ${currentQuestion}<br>...`;
+            }
+
+            if (!isOuijaActive) return;
+
+            // Wait slightly for previous movement to finish if necessary, then move
+            const targetId = getRandomElement(OUIIJA_TARGETS);
+            movePlanchette(targetId);
+
+            // Update answer state after move
+            setTimeout(() => {
+                if (targetId === 'GOODBYE') {
+                    currentSpelledAnswer += " [GOODBYE]";
+                    isOuijaActive = false;
+                    ouijaButton.disabled = true;
+                    currentOuijaAnswer.innerHTML = `**Q:** ${currentQuestion}<br>**A:** ${currentSpelledAnswer}<br><br>SESSION ENDED. Click New Question.`;
+                } else if (targetId === 'YES' || targetId === 'NO') {
+                    currentSpelledAnswer += ` [${targetId}]`;
+                } else {
+                    currentSpelledAnswer += targetId;
+                }
+
+                if (isOuijaActive) {
+                    currentOuijaAnswer.innerHTML = `**Q:** ${currentQuestion}<br>**A:** ${currentSpelledAnswer}`;
+                }
+            }, 800); // Delay slightly longer than the transition time (0.8s)
+
+        };
+
+        window.resetOuija = function() {
+            isOuijaActive = false;
+            currentSpelledAnswer = "";
+            currentQuestion = "";
+            document.getElementById('ouijaQuestion').value = "";
+            document.getElementById('ouijaQuestion').disabled = false;
+            document.getElementById('ouijaButton').textContent = "Start Session";
+            document.getElementById('ouijaButton').disabled = false;
+            document.getElementById('currentOuijaAnswer').innerHTML = "The Planchette waits...";
+            
+            // Initial position (center of board)
+            const board = document.getElementById('ouijaBoardContainer');
+            if (board) {
+                // Approximate center transform based on element size (13px half size)
+                document.getElementById('planchette').style.transform = `translate(50%, 50%)`; 
+            }
+        };
+
+        // --- 22. Arbitrary Progress (Custom Step) ---
+        let progressLevel = 0;
+        function init_game_22() { progressLevel = 0; document.getElementById('progressLevel').textContent = 0; document.getElementById('progressResult').textContent = "Keep grinding."; }
+        window.increaseProgress = function() {
+            const step = parseInt(document.getElementById('progressStep').value) || 10;
+            progressLevel = Math.min(100, progressLevel + step);
+            document.getElementById('progressLevel').textContent = progressLevel;
+            document.getElementById('progressResult').textContent = (progressLevel === 100) ? "Complete! Resetting." : "Still progressing.";
+            if (progressLevel === 100) progressLevel = 0;
+        };
+
+        // --- 23. Binary Converter ---
+        function init_game_23() { document.getElementById('binaryResult').textContent = "Binary: N/A"; document.getElementById('decInput').value = ''; }
+        window.convertToBinary = function() {
+            const dec = parseInt(document.getElementById('decInput').value);
+            document.getElementById('binaryResult').textContent = (dec >= 0) ? `Binary: ${dec.toString(2)}` : "Enter positive.";
+        };
+
+        // --- 24. Random Shape Generator (Custom) ---
+        function init_game_24() { document.getElementById('shapeResult').textContent = "Shape: N/A"; }
+        window.generateShape = function() {
+            const customShapesInput = document.getElementById('customShapes');
+            const customList = customShapesInput.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            if (customList.length === 0) { document.getElementById('shapeResult').textContent = "Define shapes first."; return; }
+            document.getElementById('shapeResult').textContent = `Shape: ${getRandomElement(customList)}`;
+        };
+        
+        // --- 25. Palindrome Check ---
+        function init_game_25() { document.getElementById('palindromeResult').textContent = "Is it?"; document.getElementById('palindromeInput').value = ''; }
+        window.checkPalindrome = function() {
+            const str = document.getElementById('palindromeInput').value.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const reversedStr = str.split('').reverse().join('');
+            document.getElementById('palindromeResult').textContent = (str.length > 0 && str === reversedStr) ? "Yes, it is a palindrome!" : "No, it is not.";
+        };
+
+        // --- 26. Odd/Even Clicker (Custom Range) ---
+        let oddEvenScore = 0;
+        function init_game_26() { oddEvenScore = 0; document.getElementById('oddEvenScore').textContent = 0; document.getElementById('oddEvenResult').textContent = "Guess correctly."; }
+        window.clickOddEven = function(isOddGuess) {
+            const max = parseInt(document.getElementById('oddEvenMax').value) || 100;
+            const num = Math.floor(Math.random() * max) + 1;
+            const isOdd = num % 2 !== 0;
+            if ((isOdd && isOddGuess) || (!isOdd && !isOddGuess)) {
+                oddEvenScore++;
+                document.getElementById('oddEvenResult').textContent = `Correct! (${num})`;
+            } else {
+                oddEvenScore--;
+                document.getElementById('oddEvenResult').textContent = `Wrong! (${num})`;
+            }
+            document.getElementById('oddEvenScore').textContent = oddEvenScore;
+        };
+
+        // --- 27. Vending Machine (Custom Cost) ---
+        let vmCredits = 10;
+        const vmItems = ["Gum", "Soda", "Stale Chip", "Broken Toy", "Mystery Box"];
+        function init_game_27() { vmCredits = 10; document.getElementById('vmCredits').textContent = 10; document.getElementById('vmResult').textContent = "Get junk."; }
+        window.buyItem = function() {
+            const cost = parseInt(document.getElementById('vmCost').value) || 5;
+            if (vmCredits >= cost) {
+                vmCredits -= cost;
+                document.getElementById('vmResult').textContent = `Dispensed: ${getRandomElement(vmItems)}`;
+            } else {
+                document.getElementById('vmResult').textContent = "Insufficient credits.";
+            }
+            document.getElementById('vmCredits').textContent = vmCredits;
+        };
+
+        // --- 28. Hex Color Generator ---
+        function init_game_28() { window.generateHexColor(); }
+        window.generateHexColor = function() {
+            const hexResult = document.getElementById('hexResult');
+            const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
+            hexResult.textContent = color;
+            hexResult.style.backgroundColor = color;
+            hexResult.style.color = "#0a0a0a";
+        };
+
+        // --- 29. Time Waster Timer ---
+        let wasteTimerInterval; let wasteTime = 0;
+        function init_game_29() { 
+            window.stopWasteTimer(); 
+            wasteTime = 0; 
+            document.getElementById('wasteTimer').textContent = '0s'; 
+        }
+        window.startWasteTimer = function() {
+            if (!wasteTimerInterval) {
+                wasteTimerInterval = setInterval(() => { 
+                    wasteTime++; 
+                    document.getElementById('wasteTimer').textContent = `${wasteTime}s`; 
+                }, 1000);
+                registerInterval(wasteTimerInterval);
+            }
+        };
+        window.stopWasteTimer = function() { 
+            clearInterval(wasteTimerInterval); 
+            wasteTimerInterval = null; 
+        };
+
+        // --- 30. Random Letter ---
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        function init_game_30() { document.getElementById('letterResult').textContent = "?"; }
+        window.generateRandomLetter = function() { document.getElementById('letterResult').textContent = getRandomElement(alphabet.split('')); };
+
+        // --- 31. Simple Calculator ---
+        function init_game_31() { document.getElementById('calcResult').textContent = "Result."; document.getElementById('calcInput').value = ''; }
+        window.calculate = function() {
+            try {
+                // WARNING: Use of eval is dangerous in real applications, but acceptable here for a sandbox distraction tool.
+                const result = eval(document.getElementById('calcInput').value);
+                document.getElementById('calcResult').textContent = `Result: ${result}`;
+            } catch (e) {
+                document.getElementById('calcResult').textContent = "Invalid expression.";
+            }
+        };
+
+        // --- 32. Quote Reverser (Custom Length) ---
+        function init_game_32() { document.getElementById('reverseResult').textContent = ""; }
+        window.reverseQuote = function() {
+            const len = parseInt(document.getElementById('reverseLen').value) || 10;
+            const quote = getRandomElement(quotes);
+            document.getElementById('reverseResult').textContent = quote.substring(0, len).split('').reverse().join('');
+        };
+
+        // --- 33. Fibonacci Step ---
+        let fibPrev = 0; let fibCurrent = 1;
+        function init_game_33() { fibPrev = 0; fibCurrent = 1; document.getElementById('fibCurrent').textContent = 1; document.getElementById('fibResult').textContent = "Sequence."; }
+        window.nextFib = function() {
+            const next = fibPrev + fibCurrent;
+            fibPrev = fibCurrent;
+            fibCurrent = next;
+            document.getElementById('fibCurrent').textContent = fibCurrent.toLocaleString();
+            document.getElementById('fibResult').textContent = `Next is ${(fibPrev + fibCurrent).toLocaleString()}`;
+        };
+
+        // --- 34. Health Bar Sim (Custom Damage) ---
+        let health = 100;
+        function init_game_34() { health = 100; document.getElementById('healthDisplay').textContent = 100; document.getElementById('healthResult').textContent = "Status."; }
+        window.takeDamage = function() {
+            const max = parseInt(document.getElementById('damageMax').value) || 20;
+            const damage = Math.floor(Math.random() * max) + 1;
+            health = Math.max(0, health - damage);
+            document.getElementById('healthDisplay').textContent = health;
+            document.getElementById('healthResult').textContent = `-${damage} HP. ${health <= 0 ? "DEAD" : "Ouch!"}`;
+        };
+        window.heal = function() {
+            const healAmt = Math.floor(Math.random() * 15) + 5;
+            health = Math.min(100, health + healAmt);
+            document.getElementById('healthDisplay').textContent = health;
+            document.getElementById('healthResult').textContent = `+${healAmt} HP.`;
+        };
+
+        // --- 35. Word Censorship (Custom Char) ---
+        function init_game_35() { document.getElementById('censorResult').textContent = "***"; document.getElementById('censorInput').value = ''; }
+        window.censorVowels = function() {
+            const censorChar = document.getElementById('censorChar').value || '*';
+            const censorInput = document.getElementById('censorInput').value;
+            document.getElementById('censorResult').textContent = censorInput.replace(/[aeiouAEIOU]/g, censorChar);
+        };
+
+        // --- 36. Click Limit (Custom) ---
+        let clickLimit;
+        function init_game_36() { 
+            const maxClickLimitInput = document.getElementById('maxClickLimit');
+            clickLimit = parseInt(maxClickLimitInput.value) || 10;
+            document.getElementById('clickLimit').textContent = clickLimit; 
+            document.getElementById('limitedResult').textContent = "Click fast!";
+            
+            // Re-attach change listener
+            maxClickLimitInput.onchange = () => { 
+                clickLimit = parseInt(maxClickLimitInput.value) || 10;
+                document.getElementById('clickLimit').textContent = clickLimit;
+                document.getElementById('limitedResult').textContent = "Max clicks reset.";
+            };
+        }
+        window.limitedClick = function() {
+            if (clickLimit > 0) {
+                clickLimit--;
+                document.getElementById('clickLimit').textContent = clickLimit;
+                document.getElementById('limitedResult').textContent = `Clicks left: ${clickLimit}`;
+            } else {
+                document.getElementById('limitedResult').textContent = "Limit reached!";
+            }
+        };
+
+        // --- 37. Word Length Count ---
+        function init_game_37() { document.getElementById('wordLengthResult').textContent = "Length: 0"; document.getElementById('wordLengthInput').value = ''; }
+        window.countWordLength = function() {
+            document.getElementById('wordLengthResult').textContent = `Length: ${document.getElementById('wordLengthInput').value.trim().length}`;
+        };
+
+        // --- 38. Random Button Press ---
+        let targetColor;
+        function init_game_38() {
+            targetColor = Math.random() < 0.5 ? 'blue' : 'red';
+            const targetButton = document.getElementById('targetButton');
+            targetButton.style.backgroundColor = (targetColor === 'blue') ? '#4fc3f7' : '#ff5252';
+            document.getElementById('targetResult').textContent = "Click Me! Target is not shown.";
+        }
+        window.clickTarget = function() {
+            const targetButton = document.getElementById('targetButton');
+            // Check current background color set by JS.
+            const clickedColor = (targetButton.style.backgroundColor.includes('79, 195, 247') || targetButton.style.backgroundColor.includes('#4fc3f7')) ? 'blue' : 'red'; 
+            if (clickedColor === targetColor) { document.getElementById('targetResult').textContent = "Correct! New Target."; }
+            else { document.getElementById('targetResult').textContent = "Wrong! New Target."; }
+            targetColor = Math.random() < 0.5 ? 'blue' : 'red';
+            targetButton.style.backgroundColor = (targetColor === 'blue') ? '#4fc3f7' : '#ff5252';
+        };
+        
+        // --- 39. Simple Lottery (Custom) ---
+        let lottoTickets = 10;
+        function init_game_39() { lottoTickets = 10; document.getElementById('lottoTickets').textContent = 10; document.getElementById('lottoResult').textContent = "Try your luck."; }
+        window.buyLotto = function() {
+            const cost = parseInt(document.getElementById('lottoCost').value) || 1;
+            lottoTickets += cost; 
+            document.getElementById('lottoTickets').textContent = lottoTickets; 
+            document.getElementById('lottoResult').textContent = `Ticket bought (+${cost}).`;
+        };
+        window.checkLotto = function() {
+            const winPct = parseInt(document.getElementById('lottoWinPct').value) / 100 || 0.1;
+            const cost = parseInt(document.getElementById('lottoCost').value) || 1;
+            if (lottoTickets >= cost) {
+                lottoTickets -= cost;
+                if (Math.random() < winPct) { document.getElementById('lottoResult').textContent = "WINNER! (+5 tickets)"; lottoTickets += 5; }
+                else { document.getElementById('lottoResult').textContent = "Loss."; }
+                document.getElementById('lottoTickets').textContent = lottoTickets;
+            } else {
+                document.getElementById('lottoResult').textContent = "Buy a ticket first!";
+            }
+        };
+
+        // --- 40. Case Converter ---
+        function init_game_40() { document.getElementById('capResult').textContent = ""; document.getElementById('capInput').value = ''; }
+        window.capitalizeText = function(mode) {
+            const input = document.getElementById('capInput').value;
+            document.getElementById('capResult').textContent = (mode === 'upper') ? input.toUpperCase() : input.toLowerCase();
+        };
+
+        // --- 41. Color Guess (3 Options) ---
+        const colors41 = [{name: 'RED', hex: '#ff5252'}, {name: 'BLUE', hex: '#4fc3f7'}, {name: 'GREEN', hex: '#69f0ae'}];
+        let targetColorIndex;
+        function init_game_41() { updateColorTarget_41(); document.getElementById('colorGuessResult').textContent = "Guess the color."; }
+        function updateColorTarget_41() {
+            targetColorIndex = Math.floor(Math.random() * 3);
+            const colorGuessTarget = document.getElementById('colorGuessTarget');
+            colorGuessTarget.style.color = colors41[targetColorIndex].hex;
+            colorGuessTarget.textContent = '?';
+        }
+        window.guessColor = function(guessIndex) {
+            if (guessIndex === targetColorIndex) { document.getElementById('colorGuessResult').textContent = "Correct!"; }
+            else { document.getElementById('colorGuessResult').textContent = `Wrong! It was ${colors41[targetColorIndex].name}.`; }
+            updateColorTarget_41();
+        };
+
+        // --- 42. Character Duplicator (Custom Count) ---
+        function init_game_42() { document.getElementById('dupResult').textContent = ""; document.getElementById('dupInput').value = ''; }
+        window.duplicateChar = function() {
+            const count = parseInt(document.getElementById('dupCount').value) || 5;
+            document.getElementById('dupResult').textContent = document.getElementById('dupInput').value.repeat(count);
+        };
+
+        // --- 43. Countdown (Custom) ---
+        let countdownInterval; let countValue;
+        function init_game_43() { 
+             // Start timer immediately upon loading
+             window.startCountdown(); 
+             // Clear the interval if it somehow exists globally before starting a new one
+             if (countdownInterval) clearInterval(countdownInterval);
+        }
+        window.startCountdown = function() {
+            if (countdownInterval) clearInterval(countdownInterval);
+            const max = parseInt(document.getElementById('countdownMax').value) || 5;
+            countValue = max;
+            document.getElementById('countdownDisplay').textContent = countValue;
+            document.getElementById('countdownResult').textContent = "Counting...";
+            countdownInterval = setInterval(() => {
+                countValue--;
+                document.getElementById('countdownDisplay').textContent = countValue;
+                if (countValue <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    document.getElementById('countdownResult').textContent = "Done!";
+                }
+            }, 1000);
+            registerInterval(countdownInterval);
+        };
+
+        // --- 44. Simple Pet Sim (Custom Cost) ---
+        let petFood = 10;
+        const petStatus = ["Happy", "Hungry", "Sleeping", "Wasting Time"];
+        function init_game_44() { petFood = 10; document.getElementById('petFood').textContent = 10; document.getElementById('petResult').textContent = "Pet: Happy"; }
+        window.feedPet = function() {
+            const cost = parseInt(document.getElementById('petCost').value) || 1;
+            if (petFood >= cost) {
+                petFood -= cost;
+                document.getElementById('petResult').textContent = `Pet: ${getRandomElement(petStatus)}`;
+            } else {
+                document.getElementById('petResult').textContent = "Pet is gone (Need food).";
+            }
+            document.getElementById('petFood').textContent = petFood;
+        };
+
+        // --- 45. Word Scrambler ---
+        function init_game_45() { document.getElementById('scrambleResult').textContent = ""; document.getElementById('scrambleInput').value = ''; }
+        window.scrambleWord = function() {
+            const word = document.getElementById('scrambleInput').value.split('');
+            for (let i = word.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [word[i], word[j]] = [word[j], word[i]];
+            }
+            document.getElementById('scrambleResult').textContent = word.join('');
+        };
+
+        // --- 46. Prime Checker ---
+        function init_game_46() { document.getElementById('primeResult').textContent = "Is it prime?"; document.getElementById('primeInput').value = ''; }
+        window.checkPrime = function() {
+            const num = parseInt(document.getElementById('primeInput').value);
+            if (isNaN(num) || num <= 1) { document.getElementById('primeResult').textContent = "Not prime."; return; }
+            for (let i = 2; i <= Math.sqrt(num); i++) {
+                if (num % i === 0) { document.getElementById('primeResult').textContent = "Not prime."; return; }
+            }
+            document.getElementById('primeResult').textContent = "It is prime!";
+        };
+
+        // --- 47. Guess the Shape ---
+        const shapes47 = ["Circle", "Square", "Triangle", "Star"];
+        function init_game_47() { document.getElementById('shapeGuessResult').textContent = "Guess."; }
+        window.guessShape = function(guess) {
+            const actualShape = getRandomElement(shapes47);
+            if (guess === actualShape) { document.getElementById('shapeGuessResult').textContent = `Correct! It was ${actualShape}.`; }
+            else { document.getElementById('shapeGuessResult').textContent = `Wrong! It was ${actualShape}.`; }
+        };
+
+        // --- 48. Click Speed (Custom Duration) ---
+        let clickSpeedCount = 0; let clickSpeedRunning = false;
+        let clickSpeedTimeout;
+        function init_game_48() { 
+            clickSpeedCount = 0; clickSpeedRunning = false;
+            document.getElementById('speedDisplay').textContent = 0;
+            document.getElementById('speedResult').textContent = "Go!";
+            if(clickSpeedTimeout) clearTimeout(clickSpeedTimeout);
+        }
+        window.startClickSpeed = function() {
+            if (clickSpeedRunning) return;
+            clickSpeedRunning = true;
+            clickSpeedCount = 0;
+            const duration = parseInt(document.getElementById('speedDuration').value) || 5;
+            document.getElementById('speedResult').textContent = `Click for ${duration}s!`;
+            
+            const clickHandler = (e) => { 
+                // Check if the click occurred on a button/control inside the game area
+                if (e.target.tagName === 'BUTTON' || e.target.onclick) { 
+                    clickSpeedCount++; 
+                }
+            };
+            document.addEventListener('click', clickHandler);
+            
+            clickSpeedTimeout = setTimeout(() => {
+                document.removeEventListener('click', clickHandler);
+                const clicksPerSecond = (clickSpeedCount / duration).toFixed(2);
+                document.getElementById('speedDisplay').textContent = clicksPerSecond;
+                document.getElementById('speedResult').textContent = `Final Clicks: ${clickSpeedCount}`;
+                clickSpeedRunning = false;
+            }, duration * 1000);
+            registerInterval(clickSpeedTimeout);
+        };
+
+        // --- 49. List Shuffler ---
+        function init_game_49() { document.getElementById('listResult').textContent = ""; document.getElementById('listInput').value = 'A, B, C, D, E'; }
+        window.shuffleList = function() {
+            let items = document.getElementById('listInput').value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+            for (let i = items.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [items[i], items[j]] = [items[j], items[i]];
+            }
+            document.getElementById('listResult').textContent = items.join(' | ');
+        };
+
+        // --- 50. Dice Sum (Multi) ---
+        let diceSumTotal = 0;
+        function init_game_50() { diceSumTotal = 0; document.getElementById('diceSumTotal').textContent = 0; document.getElementById('diceSumResult').textContent = "Sum."; }
+        window.rollTwoDice = function() {
+            const numDice = parseInt(document.getElementById('numDice').value) || 2;
+            let currentSum = 0;
+            for(let i=0; i<numDice; i++) {
+                currentSum += Math.floor(Math.random() * 6) + 1;
+            }
+            diceSumTotal += currentSum;
+            document.getElementById('diceSumTotal').textContent = diceSumTotal;
+            document.getElementById('diceSumResult').textContent = `Rolled ${numDice} dice. Sum: ${currentSum}`;
+        };
+
+        // --- 51. Roman Numeral ---
+        const romanMap = { 100: 'C', 90: 'XC', 50: 'L', 40: 'XL', 10: 'X', 9: 'IX', 5: 'V', 4: 'IV', 1: 'I' };
+        function init_game_51() { document.getElementById('romanResult').textContent = "Result."; document.getElementById('romanInput').value = ''; }
+        window.convertToRoman = function() {
+            let num = parseInt(document.getElementById('romanInput').value);
+            if (isNaN(num) || num < 1 || num > 100) { document.getElementById('romanResult').textContent = "Range 1-100."; return; }
+            let result = '';
+            // Use Object.keys to iterate in descending order
+            const sortedKeys = Object.keys(romanMap).sort((a, b) => b - a);
+            for (let i of sortedKeys) {
+                while (num >= parseInt(i)) { result += romanMap[i]; num -= parseInt(i); }
+            }
+            document.getElementById('romanResult').textContent = result;
+        };
+
+        // --- 52. Area Calc (Rect) ---
+        function init_game_52() { document.getElementById('areaResult').textContent = "Area: 0"; document.getElementById('lenInput').value = ''; document.getElementById('widInput').value = ''; }
+        window.calcArea = function() {
+            const l = parseFloat(document.getElementById('lenInput').value);
+            const w = parseFloat(document.getElementById('widInput').value);
+            if (isNaN(l) || isNaN(w) || l < 0 || w < 0) { document.getElementById('areaResult').textContent = "Invalid."; return; }
+            document.getElementById('areaResult').textContent = `Area: ${l * w}`;
+        };
+
+        // --- 53. Button Order (Custom) ---
+        let nextOrder = 1;
+        function init_game_53() { 
+            renderOrderButtons_53(); 
+            document.getElementById('orderSteps').onchange = renderOrderButtons_53;
+        }
+        function renderOrderButtons_53() {
+            const orderStepsInput = document.getElementById('orderSteps');
+            const orderButtonsContainer = document.getElementById('orderButtons');
+            const steps = parseInt(orderStepsInput.value) || 3;
+            orderButtonsContainer.innerHTML = '';
+            for (let i = 1; i <= steps; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.onclick = () => window.pressOrder(i);
+                orderButtonsContainer.appendChild(button);
+            }
+            nextOrder = 1;
+            document.getElementById('orderResult').textContent = "Start with 1.";
+        }
+        window.pressOrder = function(num) {
+            if (num === nextOrder) {
+                nextOrder++;
+                const maxSteps = parseInt(document.getElementById('orderSteps').value) || 3;
+                if (nextOrder > maxSteps) {
+                    document.getElementById('orderResult').textContent = "Success! Resetting.";
+                    nextOrder = 1;
+                } else {
+                    document.getElementById('orderResult').textContent = `Next: ${nextOrder}`;
+                }
+            } else {
+                document.getElementById('orderResult').textContent = "Fail! Start with 1.";
+                nextOrder = 1;
+            }
+        };
+
+        // --- 54. Random Name ---
+        const firstNames = ["Zorp", "Xylo", "Anya", "Bob", "Cid", "Lira", "Kael", "Riven", "Pixel", "Jazz"];
+        const lastNames = ["Flim", "Vortex", "Smith", "Jones", "King", "Zero", "Shadow", "Dune", "Bytes", "Quark"];
+        function init_game_54() { document.getElementById('nameResult').textContent = "N/A"; }
+        window.generateName = function() {
+            document.getElementById('nameResult').textContent = `${getRandomElement(firstNames)} ${getRandomElement(lastNames)}`;
+        };
+
+        // --- 55. Multi-Counter ---
+        let c1 = 0; let c2 = 0;
+        function init_game_55() { c1 = 0; c2 = 0; document.getElementById('c1').textContent = 0; document.getElementById('c2').textContent = 0; }
+        window.incC1 = function() { c1++; document.getElementById('c1').textContent = c1; };
+        window.incC2 = function() { c2++; document.getElementById('c2').textContent = c2; };
+
+        // --- 56. Day of Week ---
+        const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+        function init_game_56() { document.getElementById('dayResult').textContent = "N/A"; document.getElementById('dayIndex').value = ''; }
+        window.getDayName = function() {
+            const index = parseInt(document.getElementById('dayIndex').value);
+            document.getElementById('dayResult').textContent = (index >= 1 && index <= 7) ? days[index - 1] : "Invalid day (1-7).";
+        };
+
+        // --- 57. Word Length Filter (Custom Min Length) ---
+        function init_game_57() { document.getElementById('filterResult').textContent = ""; document.getElementById('filterInput').value = ''; }
+        window.filterWords = function() {
+            const minLen = parseInt(document.getElementById('filterMinLen').value) || 4;
+            const filtered = document.getElementById('filterInput').value.split(',').map(s => s.trim()).filter(w => w.length >= minLen);
+            document.getElementById('filterResult').textContent = filtered.join(', ');
+        };
+
+        // --- 58. Epoch Time Check ---
+        function init_game_58() { document.getElementById('epochResult').textContent = "Seconds since 1970."; }
+        window.getEpoch = function() { document.getElementById('epochResult').textContent = `Epoch: ${Math.floor(Date.now() / 1000)}`; };
+
+        // --- 59. Sentence Case ---
+        function init_game_59() { document.getElementById('sentenceResult').textContent = ""; document.getElementById('sentenceInput').value = ''; }
+        window.toSentenceCase = function() {
+            const str = document.getElementById('sentenceInput').value.toLowerCase();
+            if (str.length === 0) { document.getElementById('sentenceResult').textContent = ""; return; }
+            document.getElementById('sentenceResult').textContent = str.charAt(0).toUpperCase() + str.slice(1);
+        };
+
+        // --- 60. Even/Odd Prediction (Custom Range) ---
+        function init_game_60() { document.getElementById('predictResult').textContent = "Your prediction."; }
+        window.predictEvenOdd = function(guess) {
+            const max = parseInt(document.getElementById('predictMax').value) || 100;
+            const num = Math.floor(Math.random() * max) + 1;
+            const actual = num % 2 === 0 ? "Even" : "Odd";
+            document.getElementById('predictResult').textContent = `Roll: ${num} (${actual}). Guess: ${guess === actual ? 'Correct!' : 'Wrong!'}`;
+        };
+
+        // --- 61. Dice Roll History (Custom Max History) ---
+        let diceHistory = [];
+        function init_game_61() { diceHistory = []; document.getElementById('diceHist').textContent = "Rolls: "; document.getElementById('historyResult').textContent = ""; }
+        window.trackDiceHistory = function() {
+            const maxHist = parseInt(document.getElementById('historyMax').value) || 5;
+            const roll = Math.floor(Math.random() * 6) + 1;
+            diceHistory.push(roll);
+            document.getElementById('diceHist').textContent = `Rolls: ${diceHistory.slice(-maxHist).join(', ')}`;
+            document.getElementById('historyResult').textContent = `Total rolls: ${diceHistory.length}`;
+        };
+
+        // --- 62. Button Masher ---
+        let mashCount = 0;
+        function init_game_62() { mashCount = 0; document.getElementById('mashCount').textContent = 0; }
+        window.mashButton = function() { mashCount++; document.getElementById('mashCount').textContent = mashCount; };
+
+        // --- 63. Color Fader (Custom Speed) ---
+        let fadeInterval; let fadeR = 255;
+        function init_game_63() { 
+            document.getElementById('fadeBox').style.backgroundColor = '#FF0000';
+            document.getElementById('fadeResult').textContent = "Fading...";
+            window.startFading();
+        }
+        window.startFading = function() {
+            if (fadeInterval) clearInterval(fadeInterval);
+            const fadeBox = document.getElementById('fadeBox');
+            const speed = parseInt(document.getElementById('fadeSpeed').value) || 100;
+            fadeR = 255;
+            fadeInterval = setInterval(() => {
+                fadeR = (fadeR > 0) ? fadeR - 5 : 255;
+                const hex = rgbToHex(fadeR, 0, 0);
+                fadeBox.style.backgroundColor = hex;
+            }, speed);
+            registerInterval(fadeInterval);
+        };
+
+        // --- 64. Number Sorter ---
+        function init_game_64() { document.getElementById('sortResult').textContent = "Sorted."; document.getElementById('sortInput').value = ''; }
+        window.sortNumbers = function(mode) {
+            const numbers = document.getElementById('sortInput').value.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+            if (mode === 'asc') { document.getElementById('sortResult').textContent = numbers.sort((a, b) => a - b).join(', '); }
+            else { document.getElementById('sortResult').textContent = numbers.sort((a, b) => b - a).join(', '); }
+        };
+
+        // --- 65. Time Until Reset (Custom Duration) ---
+        let resetTimer; let resetValue;
+        function init_game_65() { 
+            window.startResetTimer(); 
+            if (resetTimer) clearInterval(resetTimer);
+        }
+        window.startResetTimer = function() {
+            if (resetTimer) clearInterval(resetTimer);
+            const duration = parseInt(document.getElementById('resetDuration').value) || 60;
+            resetValue = duration;
+            document.getElementById('resetTime').textContent = `${resetValue}s`;
+            document.getElementById('resetMessage').textContent = "Time left...";
+            resetTimer = setInterval(() => {
+                resetValue--;
+                document.getElementById('resetTime').textContent = `${resetValue}s`;
+                if (resetValue <= 0) {
+                    clearInterval(resetTimer);
+                    resetTimer = null;
+                    document.getElementById('resetMessage').textContent = "Game reset! (Or reload page).";
+                }
+            }, 1000);
+            registerInterval(resetTimer);
+        };
+
+        // --- 66. Simple Blackjack (Custom Target) ---
+        let bjTotal = 0;
+        function init_game_66() { window.resetBlackjack(); }
+        window.hitBlackjack = function() {
+            const target = parseInt(document.getElementById('bjTarget').value) || 21;
+            if (bjTotal >= target) { document.getElementById('bjResult').textContent = "Game Over/Win! Reset."; return; }
+            const card = Math.floor(Math.random() * 10) + 1;
+            bjTotal += card;
+            document.getElementById('bjTotal').textContent = bjTotal;
+            if (bjTotal > target) document.getElementById('bjResult').textContent = `Bust (${bjTotal})!`;
+            else if (bjTotal === target) document.getElementById('bjResult').textContent = `WIN!`;
+            else document.getElementById('bjResult').textContent = `Drew ${card}.`;
+        };
+        window.resetBlackjack = function() { bjTotal = 0; document.getElementById('bjTotal').textContent = 0; document.getElementById('bjResult').textContent = "New game."; };
+
+        // --- 67. Reverse Click (Custom Start) ---
+        let revTarget;
+        function init_game_67() { 
+            const revStartInput = document.getElementById('revStart');
+            revTarget = parseInt(revStartInput.value) || 10;
+            document.getElementById('revTarget').textContent = revTarget;
+            document.getElementById('revResult').textContent = "Count to 0.";
+            
+            // Re-attach change listener
+            revStartInput.onchange = () => { 
+                revTarget = parseInt(revStartInput.value) || 10; 
+                document.getElementById('revTarget').textContent = revTarget; 
+                document.getElementById('revResult').textContent = "Start count reset.";
+            };
+        }
+        window.reverseClick = function() {
+            const revStartInput = document.getElementById('revStart');
+            if (revTarget > 0) { 
+                revTarget--; 
+                document.getElementById('revTarget').textContent = revTarget; 
+                document.getElementById('revResult').textContent = `${revTarget} left.`; 
+            }
+            else { 
+                document.getElementById('revResult').textContent = "You win nothing. Resetting."; 
+                revTarget = parseInt(revStartInput.value) || 10; 
+                document.getElementById('revTarget').textContent = revTarget; 
+            }
+        };
+
+        // --- 68. Word Replacer (Custom) ---
+        function init_game_68() { document.getElementById('replaceResult').textContent = ""; document.getElementById('replaceInput').value = ''; }
+        window.replaceWord = function() {
+            const oldWord = document.getElementById('replaceOld').value;
+            const newWord = document.getElementById('replaceNew').value;
+            const regex = new RegExp(oldWord, 'gi');
+            document.getElementById('replaceResult').textContent = document.getElementById('replaceInput').value.replace(regex, newWord);
+        };
+
+        // --- 69. Unit Converter ---
+        function init_game_69() { document.getElementById('unitResult').textContent = "Result."; document.getElementById('unitInput').value = ''; }
+        window.convertUnits = function(mode) {
+            const val = parseFloat(document.getElementById('unitInput').value);
+            if (isNaN(val)) { document.getElementById('unitResult').textContent = "Invalid."; return; }
+            if (mode === 'kmToMi') { document.getElementById('unitResult').textContent = `${(val * 0.621371).toFixed(2)} mi`; }
+            else { document.getElementById('unitResult').textContent = `${(val * 1.60934).toFixed(2)} km`; }
+        };
+
+        // --- 70. Random Emoji ---
+        const emojis = ["😀", "😂", "🤯", "🤖", "😴", "🍕", "🔥", "🌍", "💀", "💩", "👾", "🥶", "🤷"];
+        function init_game_70() { document.getElementById('emojiResult').textContent = "N/A"; }
+        window.generateEmoji = function() { document.getElementById('emojiResult').textContent = getRandomElement(emojis); };
+
+        // --- 71. Secret Phrase ---
+        const secretPhrase = "ZERO EFFORT";
+        function init_game_71() { document.getElementById('phraseResult').textContent = "Try to guess."; document.getElementById('phraseInput').value = ''; }
+        window.checkPhrase = function() {
+            if (document.getElementById('phraseInput').value.toUpperCase() === secretPhrase) { document.getElementById('phraseResult').textContent = "ACCESS GRANTED. (You wasted time.)"; }
+            else { document.getElementById('phraseResult').textContent = "Access Denied."; }
+        };
+
+        // --- 72. Color Mixer 2 (RGB) ---
+        function init_game_72() { 
+            document.getElementById('rgbBox').style.backgroundColor = 'transparent';
+            document.getElementById('rInput').value = '';
+            document.getElementById('gInput').value = '';
+            document.getElementById('bInput').value = '';
+        }
+        window.showRgbColor = function() {
+            const r = parseInt(document.getElementById('rInput').value || 0);
+            const g = parseInt(document.getElementById('gInput').value || 0);
+            const b = parseInt(document.getElementById('bInput').value || 0);
+            if (r > 255 || g > 255 || b > 255 || r < 0 || g < 0 || b < 0) { document.getElementById('rgbBox').style.backgroundColor = 'transparent'; return; }
+            document.getElementById('rgbBox').style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+        };
+
+        // --- 73. Letter Remover (Custom Position) ---
+        function init_game_73() { document.getElementById('removeResult').textContent = ""; document.getElementById('removeInput').value = ''; }
+        window.removeFirstLetter = function() {
+            const pos = parseInt(document.getElementById('removePos').value) || 0;
+            const str = document.getElementById('removeInput').value;
+            if (pos >= 0 && pos < str.length) {
+                document.getElementById('removeResult').textContent = str.slice(0, pos) + str.slice(pos + 1);
+            } else {
+                document.getElementById('removeResult').textContent = "Invalid position.";
+            }
+        };
+
+        // --- 74. Dice Roll Multiplier (Custom Sides) ---
+        let multScore = 0;
+        function init_game_74() { multScore = 0; document.getElementById('multScore').textContent = 0; document.getElementById('multResult').textContent = "Roll 2 dice."; }
+        window.rollAndMultiply = function() {
+            const sides = parseInt(document.getElementById('multSides').value) || 6;
+            const d1 = Math.floor(Math.random() * sides) + 1;
+            const d2 = Math.floor(Math.random() * sides) + 1;
+            const multiplier = d1 * d2;
+            multScore += multiplier;
+            document.getElementById('multScore').textContent = multScore;
+            document.getElementById('multResult').textContent = `Rolled ${d1} x ${d2} = ${multiplier}.`;
+        };
+
+        // --- 75. Mood Tracker ---
+        const moods = ["Excited", "Bored", "Minimalist", "Confused", "Productive (Lie)", "Stressed", "Meh", "Neutral"];
+        function init_game_75() { document.getElementById('moodDisplay').textContent = "Neutral"; }
+        window.changeMood = function() { document.getElementById('moodDisplay').textContent = getRandomElement(moods); };
+
+        // --- 76. Input Mirror ---
+        function init_game_76() { 
+            const mirrorInput = document.getElementById('mirrorInput');
+            document.getElementById('mirrorResult').textContent = ""; 
+            mirrorInput.value = '';
+            // Re-attach input listener
+            mirrorInput.oninput = () => { document.getElementById('mirrorResult').textContent = mirrorInput.value; };
+        }
+
+        // --- 77. Random Integer (Custom Max) ---
+        function init_game_77() { document.getElementById('largeRandomResult').textContent = "N/A"; }
+        window.getLargeRandom = function() {
+            const max = parseInt(document.getElementById('randMax').value) || 1000;
+            document.getElementById('largeRandomResult').textContent = Math.floor(Math.random() * max) + 1;
+        };
+
+        // --- 78. Word Counter ---
+        function init_game_78() { document.getElementById('wordCountResult').textContent = "Words: 0"; document.getElementById('wordCountInput').value = ''; }
+        window.countWords = function() {
+            const wordCount = document.getElementById('wordCountInput').value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            document.getElementById('wordCountResult').textContent = `Words: ${wordCount}`;
+        };
+
+        // --- 79. Time of Day Guess ---
+        function init_game_79() { document.getElementById('timeGuessResult').textContent = "Guess now."; }
+        window.checkTimeGuess = function() {
+            const hour = new Date().getHours();
+            const actual = hour >= 12 ? 'PM' : 'AM';
+            const guess = Math.random() < 0.5 ? 'AM' : 'PM';
+            document.getElementById('timeGuessResult').textContent = `Guess: ${guess}. Actual: ${actual}. ${guess === actual ? 'Correct!' : 'Wrong!'}`;
+        };
+
+        // --- 80. Sequential Clicker (Custom Length) ---
+        let seqTarget = 1;
+        function init_game_80() { 
+            renderSeqButtons(); 
+            document.getElementById('seqLen').onchange = renderSeqButtons;
+        }
+        window.renderSeqButtons = function() {
+            const seqLenInput = document.getElementById('seqLen');
+            const seqButtonsContainer = document.getElementById('seqButtons');
+            const len = parseInt(seqLenInput.value) || 3;
+            seqButtonsContainer.innerHTML = '';
+            for (let i = 1; i <= len; i++) {
+                const button = document.createElement('button');
+                button.textContent = i;
+                button.onclick = () => window.seqClick(i);
+                seqButtonsContainer.appendChild(button);
+            }
+            seqTarget = 1;
+            document.getElementById('seqTarget').textContent = seqTarget;
+            document.getElementById('seqResult').textContent = "Start with 1.";
+        }
+        window.seqClick = function(num) {
+            if (num === seqTarget) {
+                seqTarget++;
+                const len = parseInt(document.getElementById('seqLen').value) || 3;
+                if (seqTarget > len) { document.getElementById('seqResult').textContent = "SUCCESS!"; seqTarget = 1; }
+                else { document.getElementById('seqResult').textContent = `Press ${seqTarget}.`; }
+            } else {
+                document.getElementById('seqResult').textContent = "FAIL! Start over."; seqTarget = 1;
+            }
+            document.getElementById('seqTarget').textContent = seqTarget;
+        };
+
+        // --- 81. Button Swap (Custom) ---
+        let swapTarget = 'A';
+        function init_game_81() { swapTarget = 'A'; document.getElementById('swapTarget').textContent = 'A'; document.getElementById('swapResult').textContent = "Find the target."; }
+        window.swapClick = function(clicked) {
+            if (clicked === swapTarget) { document.getElementById('swapResult').textContent = "Hit!"; }
+            else { document.getElementById('swapResult').textContent = "Miss."; }
+            swapTarget = Math.random() < 0.5 ? 'A' : 'B';
+            document.getElementById('swapTarget').textContent = swapTarget;
+        };
+
+        // --- 82. Day Number ---
+        function init_game_82() { document.getElementById('dayNumResult').textContent = "Day 1-365"; }
+        window.getDayNumber = function() {
+            const now = new Date();
+            const start = new Date(now.getFullYear(), 0, 0);
+            const diff = now - start;
+            const oneDay = 1000 * 60 * 60 * 24;
+            document.getElementById('dayNumResult').textContent = `Day ${Math.floor(diff / oneDay)}`;
+        };
+
+        // --- 83. Simple Inventory Craft (Custom Cost) ---
+        let invWood = 10; let invStone = 10; let craftedItems = 0;
+        let craftTimer;
+        function init_game_83() {
+            invWood = 10; invStone = 10; craftedItems = 0;
+            updateCraftInventory_83();
+            
+            if (craftTimer) clearInterval(craftTimer);
+            craftTimer = setInterval(() => {
+                invWood += Math.floor(Math.random() * 2);
+                invStone += Math.floor(Math.random() * 2);
+                updateCraftInventory_83();
+            }, 5000);
+            registerInterval(craftTimer);
+        }
+        function updateCraftInventory_83() {
+            document.getElementById('invWood').textContent = invWood;
+            document.getElementById('invStone').textContent = invStone;
+            document.getElementById('craftResult').textContent = `Items: ${craftedItems}`;
+        }
+        window.craftItem = function() {
+            const cost = parseInt(document.getElementById('craftCost').value) || 5;
+            if (invWood >= cost && invStone >= cost) {
+                invWood -= cost; invStone -= cost;
+                craftedItems++;
+                document.getElementById('craftResult').textContent = "Item crafted!";
+            } else {
+                document.getElementById('craftResult').textContent = `Need ${cost}W and ${cost}S!`;
+            }
+            updateCraftInventory_83();
+        };
+
+        // --- 84. Text Repetition (Custom Count) ---
+        function init_game_84() { document.getElementById('repeatResult').textContent = ""; document.getElementById('repeatInput').value = ''; }
+        window.repeatText = function() {
+            const count = parseInt(document.getElementById('repeatCount').value) || 3;
+            document.getElementById('repeatResult').textContent = document.getElementById('repeatInput').value.repeat(count);
+        };
+
+        // --- 85. Random Case ---
+        function init_game_85() { document.getElementById('caseResult').textContent = ""; document.getElementById('caseInput').value = ''; }
+        window.randomCase = function() {
+            let result = '';
+            for (const char of document.getElementById('caseInput').value) {
+                result += Math.random() < 0.5 ? char.toUpperCase() : char.toLowerCase();
+            }
+            document.getElementById('caseResult').textContent = result;
+        };
+
+        // --- 86. Trivial Geometry ---
+        function init_game_86() { document.getElementById('geomResult').textContent = "P: 0"; document.getElementById('sideInput').value = ''; }
+        window.calcPerimeter = function() {
+            const side = parseFloat(document.getElementById('sideInput').value);
+            if (isNaN(side) || side < 0) { document.getElementById('geomResult').textContent = "Invalid."; return; }
+            document.getElementById('geomResult').textContent = `P: ${side * 4}`;
+        };
+
+        // --- 87. Input Hide/Show ---
+        function init_game_87() {
+            document.getElementById('hideInput').style.display = 'none';
+            document.getElementById('hideResult').textContent = "Hidden.";
+            document.getElementById('hideInput').value = '';
+        }
+        window.toggleInput = function() {
+            const hideInput = document.getElementById('hideInput');
+            const isHidden = hideInput.style.display === 'none';
+            hideInput.style.display = isHidden ? 'block' : 'none';
+            document.getElementById('hideResult').textContent = isHidden ? "Visible." : "Hidden.";
+        };
+
+        // --- 88. Number Square Root ---
+        function init_game_88() { document.getElementById('sqrtResult').textContent = "√: N/A"; document.getElementById('sqrtInput').value = ''; }
+        window.calculateSqrt = function() {
+            const num = parseFloat(document.getElementById('sqrtInput').value);
+            if (isNaN(num) || num < 0) { document.getElementById('sqrtResult').textContent = "Invalid or negative."; return; }
+            document.getElementById('sqrtResult').textContent = `√: ${Math.sqrt(num).toFixed(4)}`;
+        };
+
+        // --- 89. Sentence Length ---
+        function init_game_89() { document.getElementById('sentenceLenResult').textContent = ""; document.getElementById('sentenceLenInput').value = ''; }
+        window.checkSentenceLength = function() {
+            const len = document.getElementById('sentenceLenInput').value.trim().length;
+            document.getElementById('sentenceLenResult').textContent = `Length ${len}. ${len > 10 ? 'Long' : 'Short'}.`;
+        };
+
+        // --- 90. Random Wait Timer (Custom Max) ---
+        let waitTimerInterval;
+        function init_game_90() { 
+            if (waitTimerInterval) clearInterval(waitTimerInterval);
+            waitTimerInterval = null;
+            document.getElementById('waitTimerDisplay').textContent = "Ready";
+            document.getElementById('waitResult').textContent = "Click start.";
+        }
+        window.startRandomWait = function() {
+            if (waitTimerInterval) return;
+            const max = parseInt(document.getElementById('waitMax').value) || 3;
+            const randomTime = Math.floor(Math.random() * max) + 1;
+            document.getElementById('waitTimerDisplay').textContent = "Waiting...";
+            document.getElementById('waitResult').textContent = `Wait for ${randomTime} seconds.`;
+            let remaining = randomTime;
+
+            waitTimerInterval = setInterval(() => {
+                remaining--;
+                document.getElementById('waitTimerDisplay').textContent = `${remaining}s remaining...`;
+                if (remaining <= 0) {
+                    clearInterval(waitTimerInterval);
+                    waitTimerInterval = null;
+                    document.getElementById('waitTimerDisplay').textContent = "Done!";
+                    document.getElementById('waitResult').textContent = "Time wasted successfully.";
+                }
+            }, 1000);
+            registerInterval(waitTimerInterval);
+        };
+
+        // --- 91. Binary Flip (Custom Bits) ---
+        let binary = [];
+        function init_game_91() { initializeBinary_91(); }
+        function initializeBinary_91() {
+            const binaryBitsInput = document.getElementById('binaryBits');
+            const bits = parseInt(binaryBitsInput.value) || 4;
+            binary = Array(bits).fill(0);
+            document.getElementById('binaryFlip').textContent = binary.join('');
+            
+            // Re-attach listener
+            binaryBitsInput.onchange = initializeBinary_91;
+        }
+        window.flipBit = function() {
+            if (binary.length === 0) return;
+            const index = Math.floor(Math.random() * binary.length);
+            binary[index] = 1 - binary[index];
+            document.getElementById('binaryFlip').textContent = binary.join('');
+        };
+
+        // --- 92. Number to Word ---
+        const numWords = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+        function init_game_92() { document.getElementById('numToWordResult').textContent = ""; document.getElementById('numToWordInput').value = ''; }
+        window.numToWord = function() {
+            const num = parseInt(document.getElementById('numToWordInput').value);
+            document.getElementById('numToWordResult').textContent = (num >= 1 && num <= 10) ? numWords[num - 1] : "1-10 only.";
+        };
+
+        // --- 93. Random Punctuation ---
+        const punctuation = [".", ",", "!", "?", ";", "..."];
+        function init_game_93() { document.getElementById('puncResult').textContent = ""; document.getElementById('puncInput').value = ''; }
+        window.addPunctuation = function() {
+            document.getElementById('puncResult').textContent = document.getElementById('puncInput').value + getRandomElement(punctuation);
+        };
+
+        // --- 94. Alphabet Position ---
+        function init_game_94() { document.getElementById('alphaResult').textContent = "1-26"; document.getElementById('alphaInput').value = ''; }
+        window.getAlphaPosition = function() {
+            const char = document.getElementById('alphaInput').value.toUpperCase();
+            const pos = char.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
+            document.getElementById('alphaResult').textContent = (pos >= 1 && pos <= 26) ? pos : "Invalid letter.";
+        };
+
+        // --- 95. Click Color Change ---
+        function init_game_95() { document.getElementById('clickColorBox').style.backgroundColor = '#333'; }
+        window.changeClickColor = function() {
+            const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+            document.getElementById('clickColorBox').style.backgroundColor = color;
+        };
+
+        // --- 96. Simple Budget (Custom Start) ---
+        let budgetCash;
+        function init_game_96() { 
+            const budgetStartInput = document.getElementById('budgetStart');
+            budgetCash = parseInt(budgetStartInput.value) || 100;
+            document.getElementById('budgetCash').textContent = budgetCash; 
+            document.getElementById('budgetResult').textContent = "Financial ruin."; 
+
+            // Re-attach listener
+            budgetStartInput.onchange = () => { 
+                budgetCash = parseInt(budgetStartInput.value) || 100; 
+                document.getElementById('budgetCash').textContent = budgetCash; 
+                document.getElementById('budgetResult').textContent = "New start balance."; 
+            };
+        }
+        window.spendMoney = function() { budgetCash = Math.max(0, budgetCash - 10); document.getElementById('budgetCash').textContent = budgetCash; document.getElementById('budgetResult').textContent = budgetCash === 0 ? "Bankrupt!" : "-10. Spend more!"; };
+        window.earnMoney = function() { budgetCash += 5; document.getElementById('budgetCash').textContent = budgetCash; document.getElementById('budgetResult').textContent = "+5. Good job."; };
+
+        // --- 97. Odd Number Check ---
+        function init_game_97() { document.getElementById('oddCheckResult').textContent = "Yes/No"; document.getElementById('oddCheckInput').value = ''; }
+        window.checkOdd = function() {
+            const num = parseInt(document.getElementById('oddCheckInput').value);
+            if (isNaN(num)) { document.getElementById('oddCheckResult').textContent = "Invalid."; return; }
+            document.getElementById('oddCheckResult').textContent = num % 2 !== 0 ? "Yes, it's odd." : "No, it's even.";
+        };
+
+        // --- 98. Multi-Step Quiz (Custom) ---
+        let multiQuizStep = 0;
+        const quizQuestions = [
+            { q: "Q1: Is this page helpful?", a: "B" },
+            { q: "Q2: Is 1+1=2?", a: "A" },
+            { q: "Q3: Is the sky blue (during the day)?", a: "A" }
+        ];
+        function init_game_98() { 
+            multiQuizStep = 0;
+            document.getElementById('multiQuizQ').textContent = quizQuestions[0].q;
+            document.getElementById('multiQuizResult').textContent = `Step 1/${quizQuestions.length}`;
+        }
+        window.nextQuizStep = function(answer) {
+            if (multiQuizStep >= quizQuestions.length) {
+                document.getElementById('multiQuizResult').textContent = "Quiz finished. Click to restart.";
+                multiQuizStep = 0;
+                document.getElementById('multiQuizQ').textContent = quizQuestions[0].q;
+                return;
+            }
+
+            if (answer === quizQuestions[multiQuizStep].a) {
+                multiQuizStep++;
+                if (multiQuizStep < quizQuestions.length) {
+                    document.getElementById('multiQuizQ').textContent = quizQuestions[multiQuizStep].q;
+                    document.getElementById('multiQuizResult').textContent = `Correct! Step ${multiQuizStep + 1}/${quizQuestions.length}`;
+                } else {
+                    document.getElementById('multiQuizQ').textContent = "COMPLETED! ALL CORRECT!";
+                    document.getElementById('multiQuizResult').textContent = "Quiz finished.";
+                }
+            } else {
+                document.getElementById('multiQuizResult').textContent = "Incorrect! Start over.";
+                multiQuizStep = 0;
+                document.getElementById('multiQuizQ').textContent = quizQuestions[0].q;
+            }
+        };
+        
+        // --- 99. Simple Timer (Custom Duration) ---
+        let simpleTimerValue; let simpleTimerInterval;
+        function init_game_99() { 
+            window.startSimpleTimer(); 
+            if (simpleTimerInterval) clearInterval(simpleTimerInterval);
+        }
+        window.startSimpleTimer = function() {
+            if (simpleTimerInterval) clearInterval(simpleTimerInterval);
+            const duration = parseInt(document.getElementById('simpleDuration').value) || 10;
+            simpleTimerValue = duration;
+            document.getElementById('simpleTimer').textContent = `${simpleTimerValue}s`;
+            document.getElementById('simpleTimerResult').textContent = "Timing...";
+            simpleTimerInterval = setInterval(() => {
+                simpleTimerValue--;
+                document.getElementById('simpleTimer').textContent = `${simpleTimerValue}s`;
+                if (simpleTimerValue <= 0) {
+                    clearInterval(simpleTimerInterval);
+                    simpleTimerInterval = null;
+                    document.getElementById('simpleTimerResult').textContent = "ZERO!";
+                }
+            }, 1000);
+            registerInterval(simpleTimerInterval);
+        };
+
+        // --- 100. Ultimate Counter (Custom Increment) ---
+        let ultimateCount = 0;
+        function init_game_100() { ultimateCount = 0; document.getElementById('ultimateCount').textContent = 0; }
+        window.incrementUltimate = function() { 
+            const rate = parseInt(document.getElementById('incrementRate').value) || 1;
+            ultimateCount += rate; 
+            document.getElementById('ultimateCount').textContent = ultimateCount.toLocaleString(); 
+        };
+    </script>
+</body>
+</html>

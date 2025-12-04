@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Infinite Game Waster 9000: The 100-Game Edition</title>
+    <style>
+        /* Minimal Blue/Black Theme */
+        body {
+            font-family: 'Consolas', monospace;
+            background-color: #0a0a0a; /* Deep Black */
+            color: #e0f7fa; /* Light Blue Text */
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #4fc3f7; /* Accent Blue */
+            margin-bottom: 30px;
+        }
+
+        .waster-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px; /* Reduced gap */
+            max-width: 1700px;
+            width: 100%;
+        }
+
+        .waster-box {
+            background-color: #1a237e; /* Deep Navy Blue */
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
+            width: 160px; /* Adjusted width */
+            height: 220px; /* Adjusted height for inputs */
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-size: 0.75em;
+            overflow: hidden;
+            text-align: left;
+        }
+
+        .waster-box:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(79, 195, 247, 0.4);
+        }
+
+        h2 {
+            color: #81d4fa;
+            border-bottom: 1px solid #4fc3f7;
+            padding-bottom: 5px;
+            margin-top: 0;
+            font-size: 0.9em;
+            height: 20px;
+            text-align: center;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        button {
+            padding: 4px 8px;
+            margin: 2px;
+            border: none;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            background-color: #4fc3f7;
+            color: #0a0a0a;
+            flex-grow: 1;
+        }
+
+        input[type="number"], input[type="text"], select {
+            padding: 3px;
+            border: 1px solid #4fc3f7;
+            border-radius: 4px;
+            background-color: #0a0a0a;
+            color: #e0f7fa;
+            width: 90%;
+            box-sizing: border-box;
+            margin: 3px 0;
+            font-size: 0.8em;
+        }
+        
+        .game-output {
+            margin-top: 5px;
+            font-size: 0.9em;
+            min-height: 20px;
+            word-wrap: break-word;
+            text-align: center;
+            border-top: 1px dashed #2c3e50;
+            padding-top: 5px;
+        }
+
+        /* --- Ouija Board Specifics --- */
+        #ouijaBoardContainer {
+            position: relative;
+            width: 100%;
+            height: 70px; 
+            margin: 5px auto;
+            border: 1px solid #4fc3f7;
+            background-color: #000033;
+            font-size: 0.6em;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .ouija-row { width: 95%; display: flex; justify-content: space-around; }
+        .ouija-char { padding: 0 1px; font-weight: bold; }
+        #planchette {
+            position: absolute;
+            width: 15px; height: 15px;
+            background-color: #ffeb3b;
+            border-radius: 50%;
+            border: 2px solid #ff5252;
+            transition: transform 0.8s ease-in-out;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+        }
+        #planchette::after { content: '👁'; font-size: 6px; }
+        #currentOuijaAnswer { text-align: center; font-size: 1.1em; }
+
+    </style>
+</head>
+<body>
+    <h1>The Infinite Game Waster 9000: The 100-Game Mega-Distraction</h1>
+    <p>100 distractions deployed. Human effort minimized to zero.</p>
+
+    <div class="waster-container">
+
+        <!-- HTML STRUCTURE FOR 100 GAMES -->
+        
+        <!-- ROW 1 (Games 1-10) -->
+        <div class="waster-box"><h2>1. RPS (Clicker)</h2><p>P <span id="rpsPlayerScore">0</span> | C <span id="rpsCompScore">0</span></p><div class="controls"><button onclick="playRPS('Rock')">R</button><button onclick="playRPS('Paper')">P</button><button onclick="playRPS('Scissors')">S</button></div><div class="game-output" id="rpsResult">Choose.</div></div>
+        <div class="waster-box"><h2>2. Guesser (Custom)</h2><p>Range: <input type="number" id="guessRange" value="100" min="10" style="width:40px;"></p><p>Att: <span id="guessAttempts">5</span></p><input type="number" id="guessInput" placeholder="Guess"><div class="controls"><button onclick="checkGuess()">Submit</button><button onclick="initializeGuessGame()">Reset</button></div><div class="game-output" id="guessResult">Start.</div></div>
+        <div class="waster-box"><h2>3. Reaction Test</h2><p>Delay: <input type="number" id="reactionMaxDelay" value="3000" min="500" style="width:50px;"> ms</p><p>Best: <span id="bestTime">N/A</span> ms</p><button id="reactionButton" onclick="handleReactionClick()">Start Test</button><div class="game-output" id="reactionTimeResult">Wait for green.</div></div>
+        <div class="waster-box"><h2>4. Coin Flip (Custom)</h2><p>Heads Bias %: <input type="number" id="coinBias" value="50" min="0" max="100" style="width:40px;"></p><p>H: <span id="coinHeads">0</span></p><button onclick="flipCoin()">Flip Coin</button><div class="game-output" id="coinResult">Ready.</div></div>
+        <div class="waster-box"><h2>5. Dice Roller (D-Custom)</h2><p>Sides: <input type="number" id="diceSides" value="6" min="2" style="width:40px;"></p><p>Rolls: <span id="diceRolls">0</span></p><button onclick="rollDice()">Roll</button><div class="game-output" id="diceResult">Roll.</div></div>
+        <div class="waster-box"><h2>6. Magic 8-Ball</h2><input type="text" id="eightBallQuestion" placeholder="Ask?"><button onclick="askEightBall()">Ask</button><div class="game-output" id="eightBallResult">Query.</div></div>
+        <div class="waster-box"><h2>7. Clicker (Custom Rate)</h2><p>Rate: <input type="number" id="clickRate" value="1" min="1" style="width:40px;"></p><p>Score: <span id="clickerScore">0</span></p><div class="controls"><button onclick="increaseClicker()">Click</button><button onclick="resetClicker()">Reset</button></div><div class="game-output">Infinite.</div></div>
+        <div class="waster-box"><h2>8. High/Low Card</h2><p>Card: <span id="currentCard">?</span></p><div class="controls"><button onclick="playCardGuess('High')">Higher</button><button onclick="playCardGuess('Low')">Lower</button></div><div class="game-output" id="cardResult">Guess next.</div></div>
+        <div class="waster-box"><h2>9. PWD Generator</h2><p>Len: <input type="number" id="pwdLength" value="8" min="4" max="20" style="width:40px;"></p><div class="controls"><input type="checkbox" id="chkSymbols" checked> Sym</div><button onclick="generatePassword()">Generate</button><div class="game-output" id="passwordResult">Click.</div></div>
+        <div class="waster-box"><h2>10. Door Selector (Custom)</h2><p>Doors: <input type="number" id="numDoors" value="3" min="2" max="5" style="width:40px;"></p><div class="controls"><span id="doorButtons"></span></div><div class="game-output" id="doorResult">Pick a door.</div></div>
+
+        <!-- ROW 2 (Games 11-20) -->
+        <div class="waster-box"><h2>11. Math Quiz (+/-)</h2><p id="mathQuestion">?</p><input type="number" id="mathAnswer" placeholder="Ans"><button onclick="submitMathAnswer()">Check</button><div class="game-output" id="mathResult">Solve.</div></div>
+        <div class="waster-box"><h2>12. Vowel Counter</h2><input type="text" id="textInput" placeholder="Type"><button onclick="countLetters()">Analyze</button><div class="game-output" id="countResult">V: 0 | C: 0</div></div>
+        <div class="waster-box"><h2>13. Collector (Multi)</h2><p>G: <span id="resourceGems">0</span> | O: <span id="resourceOre">0</span></p><div class="controls"><button onclick="collectResource('Gem')">Gem</button><button onclick="collectResource('Ore')">Ore</button></div><div class="game-output" id="resourceResult">Mine.</div></div>
+        <div class="waster-box"><h2>14. Stopwatch (Lap)</h2><p id="stopwatchDisplay">00:00.00</p><div class="controls"><button id="startStopwatch" onclick="startStopwatch()">Start</button><button id="lapStopwatch" onclick="lapStopwatch()">Lap</button><button id="resetStopwatch" onclick="resetStopwatch()">Reset</button></div><div class="game-output" id="lapHistory"></div></div>
+        <div class="waster-box"><h2>15. Quote Gen</h2><button onclick="generateQuote()">Get Quote</button><div class="game-output" id="quoteResult">Wisdom awaits.</div></div>
+        <div class="waster-box"><h2>16. Streak Tracker</h2><p>P %: <input type="number" id="flipProb" value="50" min="1" max="99" style="width:40px;"></p><p>Streak: <span id="streakCount">0</span></p><div class="controls"><button onclick="flipStreak('Heads')">H</button><button onclick="flipStreak('Tails')">T</button></div><div class="game-output" id="streakResult">Beat the odds!</div></div>
+        <div class="waster-box"><h2>17. Choice Dilemma</h2><div class="controls"><button onclick="makeDilemmaChoice('Yes')">Yes</button><button onclick="makeDilemmaChoice('No')">No</button></div><div class="game-output" id="dilemmaResult">Decision.</div></div>
+        <div class="waster-box"><h2>18. Temp Converter</h2><input type="number" id="tempInput" placeholder="Temp"><div class="controls"><button onclick="convertTemp('C')">C→F</button><button onclick="convertTemp('F')">F→C</button></div><div class="game-output" id="tempResult">Result.</div></div>
+        <div class="waster-box"><h2>19. ASCII Lookup</h2><input type="text" id="asciiInput" maxlength="1" placeholder="Char"><button onclick="getAsciiValue()">Lookup</button><div class="game-output" id="asciiResult">Value: N/A</div></div>
+        <div class="waster-box"><h2>20. Color Mixer (Hex)</h2><select id="colorSelect1"><option value="#ff0000">R</option><option value="#00ff00">G</option><option value="#0000ff">B</option></select><select id="colorSelect2"><option value="#ff0000">R</option><option value="#00ff00">G</option><option value="#0000ff">B</option></select><button onclick="mixColors()">Mix</button><div class="game-output"><div id="mixedColorBox" style="height: 10px; width: 100%; background: #ff0000;"></div></div></div>
+
+        <!-- ROW 3 (Game 21-30) -->
+        <div class="waster-box"><h2>21. VISUAL OUIJA</h2><input type="text" id="ouijaQuestion" placeholder="Question" maxlength="15"><div id="ouijaBoardContainer"><div id="planchette"></div><div class="ouija-row"><span id="o_YES" class="ouija-char">YES</span><span id="o_NO" class="ouija-char">NO</span><span id="o_GOODBYE" class="ouija-char">GOODBYE</span></div><div class="ouija-row"><span id="o_1" class="ouija-char">1</span><span id="o_2" class="ouija-char">2</span><span id="o_3" class="ouija-char">3</span><span id="o_4" class="ouija-char">4</span><span id="o_5" class="ouija-char">5</span><span id="o_6" class="ouija-char">6</span><span id="o_7" class="ouija-char">7</span><span id="o_8" class="ouija-char">8</span><span id="o_9" class="ouija-char">9</span><span id="o_0" class="ouija-char">0</span></div><div class="ouija-row"><span id="o_A" class="ouija-char">A</span><span id="o_B" class="ouija-char">B</span><span id="o_C" class="ouija-char">C</span><span id="o_D" class="ouija-char">D</span><span id="o_E" class="ouija-char">E</span><span id="o_F" class="ouija-char">F</span><span id="o_G" class="ouija-char">G</span><span id="o_H" class="ouija-char">H</span><span id="o_I" class="ouija-char">I</span><span id="o_J" class="ouija-char">J</span><span id="o_K" class="ouija-char">K</span><span id="o_L" class="ouija-char">L</span><span id="o_M" class="ouija-char">M</span></div></div><div class="controls"><button id="ouijaButton" onclick="moveRandomly()">Move Planchette</button><button id="ouijaResetButton" onclick="resetOuija()">New Question</button></div><div class="game-output" id="currentOuijaAnswer">Planchette waits...</div></div>
+        <div class="waster-box"><h2>22. Arbitrary Progress</h2><p>Step: <input type="number" id="progressStep" value="10" min="1" style="width:40px;"></p><p>Level: <span id="progressLevel">0</span>%</p><button onclick="increaseProgress()">Advance</button><div class="game-output" id="progressResult">Keep grinding.</div></div>
+        <div class="waster-box"><h2>23. Binary Converter</h2><input type="number" id="decInput" placeholder="Decimal"><button onclick="convertToBinary()">Convert</button><div class="game-output" id="binaryResult">Binary: N/A</div></div>
+        <div class="waster-box"><h2>24. Shape Generator (Custom)</h2><input type="text" id="customShapes" placeholder="Sq, Tri, Cir" value="Circle,Square,Triangle"><button onclick="generateShape()">Generate</button><div class="game-output" id="shapeResult">Shape: N/A</div></div>
+        <div class="waster-box"><h2>25. Palindrome Check</h2><input type="text" id="palindromeInput" placeholder="Word/Phrase"><button onclick="checkPalindrome()">Check</button><div class="game-output" id="palindromeResult">Is it?</div></div>
+        <div class="waster-box"><h2>26. Odd/Even Clicker</h2><p>Num Range: <input type="number" id="oddEvenMax" value="100" min="10" style="width:40px;"></p><p>Score: <span id="oddEvenScore">0</span></p><div class="controls"><button onclick="clickOddEven(true)">Odd</button><button onclick="clickOddEven(false)">Even</button></div><div class="game-output" id="oddEvenResult">Guess correctly.</div></div>
+        <div class="waster-box"><h2>27. Vending Machine</h2><p>Cost: <input type="number" id="vmCost" value="5" min="1" style="width:40px;"></p><p>Credits: <span id="vmCredits">10</span></p><button onclick="buyItem()">Buy Item</button><div class="game-output" id="vmResult">Get junk.</div></div>
+        <div class="waster-box"><h2>28. Hex Color Gen</h2><button onclick="generateHexColor()">New Hex</button><div class="game-output" id="hexResult" style="height:20px;">#FFFFFF</div></div>
+        <div class="waster-box"><h2>29. Time Waster Timer</h2><p id="wasteTimer">0s</p><div class="controls"><button onclick="startWasteTimer()">Start</button><button onclick="stopWasteTimer()">Stop</button></div><div class="game-output">Watch time fly.</div></div>
+        <div class="waster-box"><h2>30. Random Letter</h2><button onclick="generateRandomLetter()">Get Letter</button><div class="game-output" id="letterResult">?</div></div>
+
+        <!-- ROW 4 (Games 31-40) -->
+        <div class="waster-box"><h2>31. Simple Calculator</h2><input type="text" id="calcInput" placeholder="e.g., 2+2"><button onclick="calculate()">Calculate</button><div class="game-output" id="calcResult">Result.</div></div>
+        <div class="waster-box"><h2>32. Quote Reverser</h2><p>Length: <input type="number" id="reverseLen" value="10" min="5" max="30" style="width:40px;"></p><button onclick="reverseQuote()">Reverse Last</button><div class="game-output" id="reverseResult"></div></div>
+        <div class="waster-box"><h2>33. Fibonacci Step</h2><p>Current: <span id="fibCurrent">1</span></p><button onclick="nextFib()">Next Step</button><div class="game-output" id="fibResult">Sequence.</div></div>
+        <div class="waster-box"><h2>34. Health Bar Sim</h2><p>Damage Max: <input type="number" id="damageMax" value="20" min="5" style="width:40px;"></p><p>Health: <span id="healthDisplay">100</span></p><div class="controls"><button onclick="takeDamage()">Damage</button><button onclick="heal()">Heal</button></div><div class="game-output" id="healthResult">Status.</div></div>
+        <div class="waster-box"><h2>35. Word Censorship</h2><p>Char: <input type="text" id="censorChar" maxlength="1" value="*"></p><input type="text" id="censorInput" placeholder="Text"><button onclick="censorVowels()">Censor</button><div class="game-output" id="censorResult">***</div></div>
+        <div class="waster-box"><h2>36. Click Limit (Custom)</h2><p>Max Clicks: <input type="number" id="maxClickLimit" value="10" min="1" style="width:40px;"></p><p>Clicks Left: <span id="clickLimit">10</span></p><button onclick="limitedClick()">Click</button><div class="game-output" id="limitedResult">Click fast!</div></div>
+        <div class="waster-box"><h2>37. Word Length Count</h2><input type="text" id="wordLengthInput" placeholder="Word"><button onclick="countWordLength()">Count</button><div class="game-output" id="wordLengthResult">Length: 0</div></div>
+        <div class="waster-box"><h2>38. Random Button Press</h2><button id="targetButton" onclick="clickTarget()">Click Me</button><div class="game-output" id="targetResult">Success?</div></div>
+        <div class="waster-box"><h2>39. Simple Lottery (Custom)</h2><p>Cost: <input type="number" id="lottoCost" value="1" min="1" style="width:30px;"> | Win Pct: <input type="number" id="lottoWinPct" value="10" min="1" max="50" style="width:30px;"></p><p>Tickets: <span id="lottoTickets">10</span></p><div class="controls"><button onclick="buyLotto()">Buy</button><button onclick="checkLotto()">Draw</button></div><div class="game-output" id="lottoResult">Try your luck.</div></div>
+        <div class="waster-box"><h2>40. Case Converter</h2><input type="text" id="capInput" placeholder="Text"><div class="controls"><button onclick="capitalizeText('upper')">UPPER</button><button onclick="capitalizeText('lower')">lower</button></div><div class="game-output" id="capResult"></div></div>
+
+        <!-- ROW 5 (Games 41-50) -->
+        <div class="waster-box"><h2>41. Color Guess (3 Opt)</h2><p>Target: <span id="colorGuessTarget" style="color:#000;">?</span></p><div class="controls"><button onclick="guessColor(0)">R</button><button onclick="guessColor(1)">B</button><button onclick="guessColor(2)">G</button></div><div class="game-output" id="colorGuessResult">Guess the color.</div></div>
+        <div class="waster-box"><h2>42. Character Duplicator</h2><p>Count: <input type="number" id="dupCount" value="5" min="1" max="10" style="width:40px;"></p><input type="text" id="dupInput" maxlength="1" placeholder="Char"><button onclick="duplicateChar()">Duplicate</button><div class="game-output" id="dupResult"></div></div>
+        <div class="waster-box"><h2>43. Countdown (Custom)</h2><p>Max: <input type="number" id="countdownMax" value="5" min="1" style="width:40px;"></p><p id="countdownDisplay">5</p><button onclick="startCountdown()">Start</button><div class="game-output" id="countdownResult">Ready.</div></div>
+        <div class="waster-box"><h2>44. Simple Pet Sim</h2><p>Feed Cost: <input type="number" id="petCost" value="1" min="1" style="width:40px;"></p><p>Food: <span id="petFood">10</span></p><button onclick="feedPet()">Feed</button><div class="game-output" id="petResult">Pet: Happy</div></div>
+        <div class="waster-box"><h2>45. Word Scrambler</h2><input type="text" id="scrambleInput" placeholder="Word"><button onclick="scrambleWord()">Scramble</button><div class="game-output" id="scrambleResult"></div></div>
+        <div class="waster-box"><h2>46. Prime Checker</h2><input type="number" id="primeInput" placeholder="Number"><button onclick="checkPrime()">Check</button><div class="game-output" id="primeResult">Is it prime?</div></div>
+        <div class="waster-box"><h2>47. Guess the Shape</h2><div class="controls"><button onclick="guessShape('Circle')">Cir</button><button onclick="guessShape('Square')">Sq</button><button onclick="guessShape('Triangle')">Tri</button></div><div class="game-output" id="shapeGuessResult">Guess.</div></div>
+        <div class="waster-box"><h2>48. Click Speed</h2><p>Duration: <input type="number" id="speedDuration" value="5" min="2" max="10" style="width:40px;">s</p><p>Clicks/s: <span id="speedDisplay">0</span></p><button onclick="startClickSpeed()">Start</button><div class="game-output" id="speedResult">Go!</div></div>
+        <div class="waster-box"><h2>49. List Shuffler</h2><input type="text" id="listInput" placeholder="A, B, C"><button onclick="shuffleList()">Shuffle</button><div class="game-output" id="listResult"></div></div>
+        <div class="waster-box"><h2>50. Dice Sum (Multi)</h2><p>Num Dice: <input type="number" id="numDice" value="2" min="1" max="5" style="width:40px;"></p><p>Total: <span id="diceSumTotal">0</span></p><button onclick="rollTwoDice()">Roll</button><div class="game-output" id="diceSumResult">Sum.</div></div>
+
+        <!-- ROW 6 (Game 51-60) -->
+        <div class="waster-box"><h2>51. Roman Numeral</h2><input type="number" id="romanInput" placeholder="1-100"><button onclick="convertToRoman()">Convert</button><div class="game-output" id="romanResult">Result.</div></div>
+        <div class="waster-box"><h2>52. Area Calc (Rect)</h2><input type="number" id="lenInput" placeholder="L"><input type="number" id="widInput" placeholder="W"><button onclick="calcArea()">Area</button><div class="game-output" id="areaResult">Area: 0</div></div>
+        <div class="waster-box"><h2>53. Button Order (Custom)</h2><p>Steps: <input type="number" id="orderSteps" value="3" min="2" max="5" style="width:40px;"></p><div class="controls"><span id="orderButtons"></span></div><div class="game-output" id="orderResult">Start with 1.</div></div>
+        <div class="waster-box"><h2>54. Random Name</h2><button onclick="generateName()">Generate</button><div class="game-output" id="nameResult">N/A</div></div>
+        <div class="waster-box"><h2>55. Multi-Counter</h2><p>X: <span id="c1">0</span> | Y: <span id="c2">0</span></p><div class="controls"><button onclick="incC1()">+X</button><button onclick="incC2()">+Y</button></div><div class="game-output">Waste management.</div></div>
+        <div class="waster-box"><h2>56. Day of Week</h2><input type="number" id="dayIndex" placeholder="1-7"><button onclick="getDayName()">Get Day</button><div class="game-output" id="dayResult">N/A</div></div>
+        <div class="waster-box"><h2>57. Word Length Filter</h2><p>Min Len: <input type="number" id="filterMinLen" value="4" min="1" style="width:30px;"></p><input type="text" id="filterInput" placeholder="Word, Word"><button onclick="filterWords()">Filter</button><div class="game-output" id="filterResult"></div></div>
+        <div class="waster-box"><h2>58. Epoch Time Check</h2><button onclick="getEpoch()">Get Epoch</button><div class="game-output" id="epochResult">Seconds since 1970.</div></div>
+        <div class="waster-box"><h2>59. Sentence Case</h2><input type="text" id="sentenceInput" placeholder="Sentence"><button onclick="toSentenceCase()">Convert</button><div class="game-output" id="sentenceResult"></div></div>
+        <div class="waster-box"><h2>60. Even/Odd Prediction</h2><p>Range: <input type="number" id="predictMax" value="100" min="10" style="width:40px;"></p><div class="controls"><button onclick="predictEvenOdd('Even')">Even</button><button onclick="predictEvenOdd('Odd')">Odd</button></div><div class="game-output" id="predictResult">Your prediction.</div></div>
+
+        <!-- ROW 7 (Game 61-70) -->
+        <div class="waster-box"><h2>61. Dice Roll History</h2><p>Max Hist: <input type="number" id="historyMax" value="5" min="1" max="10" style="width:30px;"></p><p id="diceHist">Rolls: </p><button onclick="trackDiceHistory()">Roll</button><div class="game-output" id="historyResult"></div></div>
+        <div class="waster-box"><h2>62. Button Masher</h2><p>Presses: <span id="mashCount">0</span></p><button onclick="mashButton()">Mash!</button><div class="game-output">How fast?</div></div>
+        <div class="waster-box"><h2>63. Color Fader (Custom)</h2><p>Speed (ms): <input type="number" id="fadeSpeed" value="100" min="10" style="width:40px;"></p><div id="fadeBox" style="height: 20px; background: #FF0000;"></div><button onclick="startFading()">Start Fade</button><div class="game-output" id="fadeResult">Fading...</div></div>
+        <div class="waster-box"><h2>64. Number Sorter</h2><input type="text" id="sortInput" placeholder="5, 1, 3"><div class="controls"><button onclick="sortNumbers('asc')">Asc</button><button onclick="sortNumbers('desc')">Desc</button></div><div class="game-output" id="sortResult">Sorted.</div></div>
+        <div class="waster-box"><h2>65. Time Until Reset</h2><p>Duration: <input type="number" id="resetDuration" value="60" min="10" style="width:40px;"></p><p id="resetTime">60s</p><button onclick="startResetTimer()">Start</button><div class="game-output" id="resetMessage">Countdown.</div></div>
+        <div class="waster-box"><h2>66. Simple Blackjack</h2><p>Target: <input type="number" id="bjTarget" value="21" min="18" max="25" style="width:40px;"></p><p>Total: <span id="bjTotal">0</span></p><div class="controls"><button onclick="hitBlackjack()">Hit</button><button onclick="resetBlackjack()">Reset</button></div><div class="game-output" id="bjResult">Draw cards.</div></div>
+        <div class="waster-box"><h2>67. Reverse Click</h2><p>Start: <input type="number" id="revStart" value="10" min="1" style="width:40px;"></p><p>Target: <span id="revTarget">10</span></p><button onclick="reverseClick()">Click Down</button><div class="game-output" id="revResult">Count to 0.</div></div>
+        <div class="waster-box"><h2>68. Word Replacer</h2><p>Old: <input type="text" id="replaceOld" value="the" style="width:40px;"> New: <input type="text" id="replaceNew" value="***" style="width:40px;"></p><input type="text" id="replaceInput" placeholder="Sentence"><button onclick="replaceWord()">Replace</button><div class="game-output" id="replaceResult"></div></div>
+        <div class="waster-box"><h2>69. Unit Converter</h2><input type="number" id="unitInput" placeholder="Value"><div class="controls"><button onclick="convertUnits('kmToMi')">km→mi</button><button onclick="convertUnits('miToKm')">mi→km</button></div><div class="game-output" id="unitResult">Result.</div></div>
+        <div class="waster-box"><h2>70. Random Emoji</h2><button onclick="generateEmoji()">Get Emoji</button><div class="game-output" id="emojiResult">N/A</div></div>
+
+        <!-- ROW 8 (Game 71-80) -->
+        <div class="waster-box"><h2>71. Secret Phrase</h2><input type="text" id="phraseInput" placeholder="Guess Phrase"><button onclick="checkPhrase()">Check</button><div class="game-output" id="phraseResult">Try to guess.</div></div>
+        <div class="waster-box"><h2>72. Color Mixer 2 (RGB)</h2><input type="number" id="rInput" placeholder="R"><input type="number" id="gInput" placeholder="G"><input type="number" id="bInput" placeholder="B"><button onclick="showRgbColor()">Show</button><div class="game-output"><div id="rgbBox" style="height: 10px; width: 100%;"></div></div></div>
+        <div class="waster-box"><h2>73. Letter Remover (Custom)</h2><p>Position (0=First): <input type="number" id="removePos" value="0" min="0" style="width:30px;"></p><input type="text" id="removeInput" placeholder="Text"><button onclick="removeFirstLetter()">Remove</button><div class="game-output" id="removeResult"></div></div>
+        <div class="waster-box"><h2>74. Dice Roll Multiplier</h2><p>Sides: <input type="number" id="multSides" value="6" min="2" style="width:40px;"></p><p>Score: <span id="multScore">0</span></p><button onclick="rollAndMultiply()">Roll & Multiply</button><div class="game-output" id="multResult">Roll 2 dice.</div></div>
+        <div class="waster-box"><h2>75. Mood Tracker</h2><button onclick="changeMood()">Change Mood</button><div class="game-output" id="moodDisplay">Neutral</div></div>
+        <div class="waster-box"><h2>76. Input Mirror</h2><input type="text" id="mirrorInput" placeholder="Mirror This"><div class="game-output" id="mirrorResult"></div></div>
+        <div class="waster-box"><h2>77. Random Integer (Custom)</h2><p>Max: <input type="number" id="randMax" value="1000" min="10" style="width:40px;"></p><button onclick="getLargeRandom()">Generate</button><div class="game-output" id="largeRandomResult">N/A</div></div>
+        <div class="waster-box"><h2>78. Word Counter</h2><input type="text" id="wordCountInput" placeholder="Enter words"><button onclick="countWords()">Count Words</button><div class="game-output" id="wordCountResult">Words: 0</div></div>
+        <div class="waster-box"><h2>79. Time of Day Guess</h2><button onclick="checkTimeGuess()">Guess AM/PM</button><div class="game-output" id="timeGuessResult">Guess now.</div></div>
+        <div class="waster-box"><h2>80. Sequential Clicker</h2><p>Length: <input type="number" id="seqLen" value="3" min="2" max="5" style="width:30px;"></p><p>Next: <span id="seqTarget">1</span></p><div class="controls"><span id="seqButtons"></span></div><div class="game-output" id="seqResult">Sequence.</div></div>
+
+        <!-- ROW 9 (Game 81-90) -->
+        <div class="waster-box"><h2>81. Button Swap (Custom)</h2><p>Target: <span id="swapTarget">A</span></p><div class="controls"><button id="swapA" onclick="swapClick('A')">A</button><button id="swapB" onclick="swapClick('B')">B</button></div><div class="game-output" id="swapResult">Find the target.</div></div>
+        <div class="waster-box"><h2>82. Day Number</h2><button onclick="getDayNumber()">Get Day #</button><div class="game-output" id="dayNumResult">Day 1-365</div></div>
+        <div class="waster-box"><h2>83. Simple Inventory Craft</h2><p>Cost: <input type="number" id="craftCost" value="5" min="1" style="width:30px;"></p><p>W: <span id="invWood">0</span> | S: <span id="invStone">0</span></p><button onclick="craftItem()">Craft</button><div class="game-output" id="craftResult">Items: 0</div></div>
+        <div class="waster-box"><h2>84. Text Repetition</h2><p>Times: <input type="number" id="repeatCount" value="3" min="1" max="10" style="width:30px;"></p><input type="text" id="repeatInput" placeholder="Word"><button onclick="repeatText()">Repeat</button><div class="game-output" id="repeatResult"></div></div>
+        <div class="waster-box"><h2>85. Random Case</h2><input type="text" id="caseInput" placeholder="Text"><button onclick="randomCase()">Random Case</button><div class="game-output" id="caseResult"></div></div>
+        <div class="waster-box"><h2>86. Trivial Geometry</h2><input type="number" id="sideInput" placeholder="Side"><button onclick="calcPerimeter()">Perimeter (Sq)</button><div class="game-output" id="geomResult">P: 0</div></div>
+        <div class="waster-box"><h2>87. Input Hide/Show</h2><input type="text" id="hideInput" placeholder="Secret" style="display:none;"><button onclick="toggleInput()">Toggle Input</button><div class="game-output" id="hideResult">Hidden.</div></div>
+        <div class="waster-box"><h2>88. Number Square Root</h2><input type="number" id="sqrtInput" placeholder="Number"><button onclick="calculateSqrt()">Calculate √</button><div class="game-output" id="sqrtResult">√: N/A</div></div>
+        <div class="waster-box"><h2>89. Sentence Length</h2><input type="text" id="sentenceLenInput" placeholder="Sentence"><button onclick="checkSentenceLength()">Check Length</button><div class="game-output" id="sentenceLenResult"></div></div>
+        <div class="waster-box"><h2>90. Random Wait Timer</h2><p>Max: <input type="number" id="waitMax" value="3" min="1" style="width:40px;">s</p><p id="waitTimerDisplay">Ready</p><button onclick="startRandomWait()">Wait Random</button><div class="game-output" id="waitResult">Click start.</div></div>
+
+        <!-- ROW 10 (Game 91-100) -->
+        <div class="waster-box"><h2>91. Binary Flip</h2><p>Bits: <input type="number" id="binaryBits" value="4" min="2" max="8" style="width:30px;"></p><p id="binaryFlip">0000</p><button onclick="flipBit()">Flip Bit</button><div class="game-output">Change the bits.</div></div>
+        <div class="waster-box"><h2>92. Number to Word</h2><input type="number" id="numToWordInput" placeholder="1-10"><button onclick="numToWord()">Convert</button><div class="game-output" id="numToWordResult"></div></div>
+        <div class="waster-box"><h2>93. Random Punctuation</h2><input type="text" id="puncInput" placeholder="Text"><button onclick="addPunctuation()">Add Punct.</button><div class="game-output" id="puncResult"></div></div>
+        <div class="waster-box"><h2>94. Alphabet Position</h2><input type="text" id="alphaInput" maxlength="1" placeholder="Letter"><button onclick="getAlphaPosition()">Get Pos</button><div class="game-output" id="alphaResult">1-26</div></div>
+        <div class="waster-box"><h2>95. Click Color Change</h2><div id="clickColorBox" style="height: 20px; background: #333;"></div><button onclick="changeClickColor()">Change Box</button><div class="game-output">Endless hues.</div></div>
+        <div class="waster-box"><h2>96. Simple Budget</h2><p>Start: <input type="number" id="budgetStart" value="100" min="10" style="width:40px;"></p><p>Cash: <span id="budgetCash">100</span></p><div class="controls"><button onclick="spendMoney()">Spend (-10)</button><button onclick="earnMoney()">Earn (+5)</button></div><div class="game-output" id="budgetResult">Financial ruin.</div></div>
+        <div class="waster-box"><h2>97. Odd Number Check</h2><input type="number" id="oddCheckInput" placeholder="Number"><button onclick="checkOdd()">Is Odd?</button><div class="game-output" id="oddCheckResult">Yes/No</div></div>
+        <div class="waster-box"><h2>98. Multi-Step Quiz (Custom)</h2><p id="multiQuizQ">Q1</p><div class="controls"><button onclick="nextQuizStep('A')">A</button><button onclick="nextQuizStep('B')">B</button></div><div class="game-output" id="multiQuizResult">Step 1/3</div></div>
+        <div class="waster-box"><h2>99. Simple Timer (Custom)</h2><p>Duration: <input type="number" id="simpleDuration" value="10" min="1" style="width:40px;">s</p><p id="simpleTimer">10s</p><button onclick="startSimpleTimer()">Start</button><div class="game-output" id="simpleTimerResult">Time left.</div></div>
+        <div class="waster-box"><h2>100. Ultimate Counter</h2><p>Increment: <input type="number" id="incrementRate" value="1" min="1" style="width:40px;"></p><p>Count: <span id="ultimateCount">0</span></p><button onclick="incrementUltimate()">Count</button><div class="game-output">The final click.</div></div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Utility Functions ---
+            function getRandomElement(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+            function hexToRgb(hex) { const bigint = parseInt(hex.slice(1), 16); return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255]; }
+            function rgbToHex(r, g, b) { return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase(); }
+
+            // =========================================================
+            // GAME 1-20 (Customized and Enhanced)
+            // =========================================================
+
+            // --- 1. RPS (Clicker) ---
+            let rpsPlayerScore = 0; let rpsCompScore = 0;
+            const rpsResult = document.getElementById('rpsResult');
+            const rpsPlayerScoreDisplay = document.getElementById('rpsPlayerScore');
+            const rpsCompScoreDisplay = document.getElementById('rpsCompScore');
+            const rpsChoices = ['Rock', 'Paper', 'Scissors'];
+            window.playRPS = function (playerChoice) {
+                const computerChoice = getRandomElement(rpsChoices);
+                let message = `${playerChoice} vs ${computerChoice}. `;
+                if (playerChoice === computerChoice) { message += "Draw!"; }
+                else if ((playerChoice === 'Rock' && computerChoice === 'Scissors') || (playerChoice === 'Paper' && computerChoice === 'Rock') || (playerChoice === 'Scissors' && computerChoice === 'Paper')) { rpsPlayerScore++; message += "You Win!"; }
+                else { rpsCompScore++; message += "Comp Wins."; }
+                rpsPlayerScoreDisplay.textContent = rpsPlayerScore;
+                rpsCompScoreDisplay.textContent = rpsCompScore;
+                rpsResult.textContent = message;
+            };
+
+            // --- 2. Number Guessing Game (Custom) ---
+            const guessRangeInput = document.getElementById('guessRange');
+            let secretNumber; let attemptsLeft;
+            const guessAttemptsDisplay = document.getElementById('guessAttempts');
+            const guessInput = document.getElementById('guessInput');
+            const guessResult = document.getElementById('guessResult');
+            const initialAttempts = 5;
+            window.initializeGuessGame = function() {
+                const maxRange = parseInt(guessRangeInput.value) || 100;
+                secretNumber = Math.floor(Math.random() * maxRange) + 1;
+                attemptsLeft = initialAttempts;
+                guessAttemptsDisplay.textContent = attemptsLeft;
+                guessInput.disabled = false;
+                guessInput.value = '';
+                guessResult.textContent = `New number (1-${maxRange}).`;
+            };
+            window.checkGuess = function () {
+                if (attemptsLeft <= 0) return;
+                const userGuess = parseInt(guessInput.value);
+                const maxRange = parseInt(guessRangeInput.value) || 100;
+                if (isNaN(userGuess) || userGuess < 1 || userGuess > maxRange) { guessResult.textContent = `Invalid (1-${maxRange}).`; return; }
+                attemptsLeft--;
+                guessAttemptsDisplay.textContent = attemptsLeft;
+                if (userGuess === secretNumber) { guessResult.textContent = `SUCCESS! (${secretNumber})`; guessInput.disabled = true; } 
+                else if (attemptsLeft === 0) { guessResult.textContent = `Game Over! Was ${secretNumber}.`; } 
+                else if (userGuess < secretNumber) { guessResult.textContent = "Too low."; } 
+                else { guessResult.textContent = "Too high."; }
+            };
+            initializeGuessGame();
+
+            // --- 3. Reaction Time Tester (Custom) ---
+            const reactionButton = document.getElementById('reactionButton');
+            const reactionResult = document.getElementById('reactionTimeResult');
+            const bestTimeDisplay = document.getElementById('bestTime');
+            const reactionMaxDelayInput = document.getElementById('reactionMaxDelay');
+            let waitingForGreen = false;
+            let startTime = 0;
+            let timeoutId;
+            let bestTime = Infinity;
+            window.handleReactionClick = function () {
+                if (reactionButton.textContent === "Start Test") {
+                    reactionButton.textContent = "Wait...";
+                    reactionButton.classList.add('wait');
+                    reactionButton.classList.remove('go');
+                    waitingForGreen = true;
+                    reactionResult.textContent = "Waiting for green light...";
+                    const maxDelay = parseInt(reactionMaxDelayInput.value) || 3000;
+                    const delay = Math.random() * (maxDelay - 500) + 500;
+                    timeoutId = setTimeout(goGreen, delay);
+                } else if (waitingForGreen) {
+                    clearTimeout(timeoutId);
+                    reactionResult.textContent = "Too soon! Restart.";
+                    reactionButton.textContent = "Start Test";
+                    reactionButton.classList.remove('wait', 'go');
+                    waitingForGreen = false;
+                } else if (reactionButton.textContent === "CLICK NOW!") {
+                    const reactionTime = Math.round(performance.now() - startTime);
+                    if (reactionTime < bestTime) { bestTime = reactionTime; bestTimeDisplay.textContent = `${bestTime} ms (RECORD!)`; }
+                    reactionResult.textContent = `Time: ${reactionTime} ms`;
+                    reactionButton.textContent = "Start Test";
+                    reactionButton.classList.remove('go');
+                }
+            };
+            function goGreen() {
+                if (waitingForGreen) { reactionButton.textContent = "CLICK NOW!"; reactionButton.classList.add('go'); reactionButton.classList.remove('wait'); startTime = performance.now(); waitingForGreen = false; }
+            }
+
+            // --- 4. Coin Flip (Custom) ---
+            let coinFlips = 0; let coinHeads = 0;
+            const coinResult = document.getElementById('coinResult');
+            const coinHeadsDisplay = document.getElementById('coinHeads');
+            const coinBiasInput = document.getElementById('coinBias');
+            window.flipCoin = function () {
+                const bias = parseInt(coinBiasInput.value) / 100 || 0.5;
+                const result = Math.random() < bias ? 'Heads' : 'Tails';
+                coinFlips++;
+                if (result === 'Heads') coinHeads++;
+                coinHeadsDisplay.textContent = coinHeads;
+                coinResult.textContent = `Result: ${result}. Total Flips: ${coinFlips}`;
+            };
+
+            // --- 5. Dice Roller (D-Custom) ---
+            let diceRolls = 0;
+            const diceResult = document.getElementById('diceResult');
+            const diceRollsDisplay = document.getElementById('diceRolls');
+            const diceSidesInput = document.getElementById('diceSides');
+            window.rollDice = function () {
+                const sides = parseInt(diceSidesInput.value) || 6;
+                const roll = Math.floor(Math.random() * sides) + 1;
+                diceRolls++;
+                diceRollsDisplay.textContent = diceRolls;
+                diceResult.textContent = `Rolled a ${roll} (D${sides}).`;
+            };
+
+            // --- 6. Magic 8-Ball ---
+            const eightBallResponses = ["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes, definitely.", "You may rely on it.", "As I see it, yes.", "Most likely.", "Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."];
+            const eightBallResult = document.getElementById('eightBallResult');
+            const eightBallQuestion = document.getElementById('eightBallQuestion');
+            window.askEightBall = function () {
+                if (eightBallQuestion.value.trim() === "") { eightBallResult.textContent = "Ask a question first!"; return; }
+                eightBallResult.textContent = getRandomElement(eightBallResponses);
+                eightBallQuestion.value = "";
+            };
+
+            // --- 7. Simple Incremental Clicker (Custom Rate) ---
+            let clickerScore = 0;
+            const clickerScoreDisplay = document.getElementById('clickerScore');
+            const clickRateInput = document.getElementById('clickRate');
+            window.increaseClicker = function () { 
+                const rate = parseInt(clickRateInput.value) || 1;
+                clickerScore += rate; 
+                clickerScoreDisplay.textContent = clickerScore.toLocaleString(); 
+            };
+            window.resetClicker = function () { clickerScore = 0; clickerScoreDisplay.textContent = 0; };
+
+            // --- 8. High/Low Card Game ---
+            const cardValues = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
+            let currentCardValue = Math.floor(Math.random() * 13) + 1;
+            const currentCardDisplay = document.getElementById('currentCard');
+            const cardResult = document.getElementById('cardResult');
+            const cardLabels = { 1: 'A', 11: 'J', 12: 'Q', 13: 'K' };
+            function getCardLabel(value) { return cardLabels[value] || value; }
+            currentCardDisplay.textContent = getCardLabel(currentCardValue);
+            window.playCardGuess = function (guess) {
+                const nextCardValue = Math.floor(Math.random() * 13) + 1;
+                let resultMessage = "";
+                if (nextCardValue === currentCardValue) { resultMessage = `${getCardLabel(nextCardValue)}. Draw!`; }
+                else if ((nextCardValue > currentCardValue && guess === 'High') || (nextCardValue < currentCardValue && guess === 'Low')) { resultMessage = `${getCardLabel(nextCardValue)}. Correct!`; } 
+                else { resultMessage = `${getCardLabel(nextCardValue)}. Wrong!`; }
+                currentCardValue = nextCardValue;
+                currentCardDisplay.textContent = getCardLabel(currentCardValue);
+                cardResult.textContent = resultMessage;
+            };
+
+            // --- 9. Random Password Generator (Custom) ---
+            const pwdLengthInput = document.getElementById('pwdLength');
+            const chkSymbols = document.getElementById('chkSymbols');
+            const passwordResult = document.getElementById('passwordResult');
+            window.generatePassword = function () {
+                const length = parseInt(pwdLengthInput.value) || 8;
+                let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                if (chkSymbols.checked) chars += "!@#$%^&*()_+";
+                if (length < 4 || length > 20 || chars.length === 0) { passwordResult.textContent = "Error: Invalid settings."; return; }
+                let password = "";
+                for (let i = 0; i < length; i++) { password += chars.charAt(Math.floor(Math.random() * chars.length)); }
+                passwordResult.textContent = password;
+            };
+
+            // --- 10. Door Selector (Custom) ---
+            const numDoorsInput = document.getElementById('numDoors');
+            const doorButtonsContainer = document.getElementById('doorButtons');
+            const doorResult = document.getElementById('doorResult');
+            const doorPrizes = ["Sand", "Disappointment", "Key", "Lint", "New Game"];
+            
+            function renderDoorButtons() {
+                const numDoors = parseInt(numDoorsInput.value) || 3;
+                doorButtonsContainer.innerHTML = '';
+                for (let i = 1; i <= numDoors; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = `D${i}`;
+                    button.onclick = () => window.chooseDoor(i);
+                    doorButtonsContainer.appendChild(button);
+                }
+            }
+            numDoorsInput.addEventListener('change', renderDoorButtons);
+            renderDoorButtons();
+
+            window.chooseDoor = function (doorNum) {
+                const numDoors = parseInt(numDoorsInput.value) || 3;
+                const winningDoor = Math.floor(Math.random() * numDoors) + 1;
+                if (doorNum === winningDoor) { doorResult.textContent = `Door ${doorNum}: ${getRandomElement(doorPrizes)}.`; } 
+                else { doorResult.textContent = `Door ${doorNum} was empty.`; }
+            };
+
+            // --- 11. Trivial Math Quiz ---
+            const mathQuestionDisplay = document.getElementById('mathQuestion');
+            const mathAnswerInput = document.getElementById('mathAnswer');
+            const mathResult = document.getElementById('mathResult');
+            let currentAnswer = 0;
+            function generateMathQuestion() {
+                const num1 = Math.floor(Math.random() * 10) + 1;
+                const num2 = Math.floor(Math.random() * 10) + 1;
+                const operator = Math.random() < 0.5 ? '+' : '-';
+                if (operator === '+') { currentAnswer = num1 + num2; mathQuestionDisplay.textContent = `${num1} + ${num2}?`; } 
+                else { currentAnswer = Math.abs(num1 - num2); mathQuestionDisplay.textContent = `${Math.max(num1, num2)} - ${Math.min(num1, num2)}?`; }
+                mathAnswerInput.value = '';
+                mathResult.textContent = "Solve.";
+            }
+            window.submitMathAnswer = function () {
+                const userAnswer = parseInt(mathAnswerInput.value);
+                if (userAnswer === currentAnswer) { mathResult.textContent = "Correct! New Q."; generateMathQuestion(); } 
+                else { mathResult.textContent = "Incorrect."; }
+            };
+            generateMathQuestion();
+
+            // --- 12. Vowel/Consonant Counter ---
+            const textInput = document.getElementById('textInput');
+            const countResult = document.getElementById('countResult');
+            window.countLetters = function () {
+                const text = textInput.value.toLowerCase().replace(/[^a-z]/g, "");
+                let vowels = 0; let consonants = 0;
+                for (const char of text) { if ('aeiou'.includes(char)) { vowels++; } else { consonants++; } }
+                countResult.textContent = `V: ${vowels} | C: ${consonants}`;
+            };
+
+            // --- 13. Simple Inventory Clicker ---
+            let resourceGems = 0; let resourceOre = 0;
+            const resourceGemsDisplay = document.getElementById('resourceGems');
+            const resourceOreDisplay = document.getElementById('resourceOre');
+            const resourceResult = document.getElementById('resourceResult');
+            window.collectResource = function (type) {
+                const amount = Math.floor(Math.random() * 3) + 1; // Randomized collect
+                if (type === 'Gem') { resourceGems += amount; resourceGemsDisplay.textContent = resourceGems; resourceResult.textContent = `+${amount} Gem.`; } 
+                else { resourceOre += amount; resourceOreDisplay.textContent = resourceOre; resourceResult.textContent = `+${amount} Ore.`; }
+            };
+
+            // --- 14. Stopwatch (Lap) ---
+            let stopwatchInterval; let running = false; let elapsedTime = 0;
+            const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+            const startStopwatchButton = document.getElementById('startStopwatch');
+            const lapStopwatchButton = document.getElementById('lapStopwatch');
+            const lapHistory = document.getElementById('lapHistory');
+            function formatTime(ms) {
+                const totalSeconds = Math.floor(ms / 1000);
+                const minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+                const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+                const centiseconds = Math.floor((ms % 1000) / 10).toString().padStart(2, '0');
+                return `${minutes}:${seconds}.${centiseconds}`;
+            }
+            window.startStopwatch = function () {
+                if (!running) {
+                    running = true;
+                    startStopwatchButton.textContent = "Pause";
+                    lapStopwatchButton.disabled = false;
+                    const startTime = Date.now() - elapsedTime;
+                    stopwatchInterval = setInterval(() => { elapsedTime = Date.now() - startTime; stopwatchDisplay.textContent = formatTime(elapsedTime); }, 10);
+                } else {
+                    clearInterval(stopwatchInterval);
+                    running = false;
+                    startStopwatchButton.textContent = "Resume";
+                    lapStopwatchButton.disabled = true;
+                }
+            };
+            window.lapStopwatch = function () {
+                if (running) {
+                    const lapTime = formatTime(elapsedTime);
+                    lapHistory.innerHTML = `Lap: ${lapTime}<br>` + lapHistory.innerHTML;
+                }
+            };
+            window.resetStopwatch = function () {
+                clearInterval(stopwatchInterval); running = false; elapsedTime = 0;
+                stopwatchDisplay.textContent = "00:00.00"; startStopwatchButton.textContent = "Start";
+                lapHistory.innerHTML = ""; lapStopwatchButton.disabled = true;
+            };
+
+            // --- 15. Quote Randomizer ---
+            const quotes = ["The only true wisdom is in knowing you know nothing.", "Life is what happens when you're busy making other plans.", "Eighty percent of success is showing up.", "Why put off till tomorrow what you can completely ignore?", "I am wasting time, therefore I am."];
+            const quoteResult = document.getElementById('quoteResult');
+            window.generateQuote = function () { quoteResult.textContent = getRandomElement(quotes); };
+            generateQuote();
+
+            // --- 16. Heads or Tails Streak Tracker (Custom Prob) ---
+            let currentStreak = 0;
+            let currentStreakSide = null;
+            const streakCountDisplay = document.getElementById('streakCount');
+            const streakResult = document.getElementById('streakResult');
+            const flipProbInput = document.getElementById('flipProb');
+            window.flipStreak = function (playerGuess) {
+                const probability = parseInt(flipProbInput.value) / 100 || 0.5;
+                const flip = Math.random() < probability ? 'Heads' : 'Tails';
+                if (flip === playerGuess) {
+                    currentStreak = (flip === currentStreakSide) ? currentStreak + 1 : 1;
+                    currentStreakSide = flip;
+                    streakResult.textContent = `It was ${flip}. Streak: ${currentStreak}`;
+                } else {
+                    currentStreak = 0;
+                    currentStreakSide = null;
+                    streakResult.textContent = `It was ${flip}. Streak broken.`;
+                }
+                streakCountDisplay.textContent = currentStreak;
+            };
+
+            // --- 17. Choice Dilemma ---
+            const dilemmaResult = document.getElementById('dilemmaResult');
+            window.makeDilemmaChoice = function (choice) {
+                const outcome = Math.random() < 0.5 ? 'Correct' : 'Incorrect';
+                dilemmaResult.textContent = `${choice}. Result: ${outcome}.`;
+            };
+
+            // --- 18. Temperature Converter ---
+            const tempInput = document.getElementById('tempInput');
+            const tempResult = document.getElementById('tempResult');
+            window.convertTemp = function (mode) {
+                const value = parseFloat(tempInput.value);
+                if (isNaN(value)) { tempResult.textContent = "Invalid."; return; }
+                let converted;
+                if (mode === 'C') { converted = (value * 9/5) + 32; tempResult.textContent = `${converted.toFixed(1)}°F`; } 
+                else { converted = (value - 32) * 5/9; tempResult.textContent = `${converted.toFixed(1)}°C`; }
+            };
+
+            // --- 19. Character ASCII Value ---
+            const asciiInput = document.getElementById('asciiInput');
+            const asciiResult = document.getElementById('asciiResult');
+            window.getAsciiValue = function () {
+                const char = asciiInput.value.trim();
+                if (char.length !== 1) { asciiResult.textContent = "Enter 1 char."; return; }
+                asciiResult.textContent = `Value: ${char.charCodeAt(0)}`;
+            };
+
+            // --- 20. Color Mixer (Hex) ---
+            const colorSelect1 = document.getElementById('colorSelect1');
+            const colorSelect2 = document.getElementById('colorSelect2');
+            const mixedColorBox = document.getElementById('mixedColorBox');
+            window.mixColors = function () {
+                const rgb1 = hexToRgb(colorSelect1.value);
+                const rgb2 = hexToRgb(colorSelect2.value);
+                const mixedHex = rgbToHex(Math.floor((rgb1[0] + rgb2[0]) / 2), Math.floor((rgb1[1] + rgb2[1]) / 2), Math.floor((rgb1[2] + rgb2[2]) / 2));
+                mixedColorBox.style.backgroundColor = mixedHex;
+            };
+            mixColors();
+
+            // =========================================================
+            // GAME 21: VISUAL OUIJA BOARD (Continuous Randomization)
+            // =========================================================
+            const ouijaQuestion = document.getElementById('ouijaQuestion');
+            const ouijaButton = document.getElementById('ouijaButton');
+            const ouijaResetButton = document.getElementById('ouijaResetButton');
+            const currentOuijaAnswer = document.getElementById('currentOuijaAnswer');
+            const planchette = document.getElementById('planchette');
+            const ouijaBoardContainer = document.getElementById('ouijaBoardContainer');
+            
+            let isOuijaActive = false;
+            let currentSpelledAnswer = "";
+            let currentQuestion = "";
+
+            const ouijaTargets = [
+                'YES', 'NO', 'GOODBYE',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+                'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'
+            ];
+            
+            ouijaButton.textContent = "Start Session"; // Initial state
+
+            function movePlanchette(targetId) {
+                const targetElement = document.getElementById(`o_${targetId}`);
+                if (!targetElement) return;
+
+                const boardRect = ouijaBoardContainer.getBoundingClientRect();
+                const targetRect = targetElement.getBoundingClientRect();
+                const targetX = targetRect.left + (targetRect.width / 2) - boardRect.left;
+                const targetY = targetRect.top + (targetRect.height / 2) - boardRect.top;
+                
+                // 7.5px is half the planchette size (15px)
+                planchette.style.transform = `translate(${targetX - 7.5}px, ${targetY - 7.5}px)`;
+            }
+
+            window.moveRandomly = function () {
+                if (!isOuijaActive) {
+                    if (ouijaQuestion.value.trim().length < 5) {
+                        currentOuijaAnswer.innerHTML = "Please ask a thoughtful question (5+ chars) first.";
+                        return;
+                    }
+                    currentQuestion = ouijaQuestion.value.trim();
+                    isOuijaActive = true;
+                    ouijaQuestion.disabled = true;
+                    ouijaButton.textContent = "Move Planchette";
+                    currentOuijaAnswer.innerHTML = `**Q:** ${currentQuestion}<br>...`;
+                }
+
+                // Wait slightly for previous movement to finish if necessary, then move
+                setTimeout(() => {
+                    const targetId = getRandomElement(ouijaTargets);
+                    movePlanchette(targetId);
+
+                    if (targetId === 'GOODBYE') {
+                        currentSpelledAnswer += " [GOODBYE]";
+                        currentOuijaAnswer.innerHTML = `**Q:** ${currentQuestion}<br>**A:** ${currentSpelledAnswer}<br><br>SESSION ENDED. Click New Question.`;
+                        isOuijaActive = false;
+                        ouijaButton.disabled = true;
+                    } else if (targetId === 'YES' || targetId === 'NO') {
+                         currentSpelledAnswer += ` [${targetId}]`;
+                    } else {
+                        currentSpelledAnswer += targetId;
+                    }
+
+                    if (isOuijaActive) {
+                        currentOuijaAnswer.innerHTML = `**Q:** ${currentQuestion}<br>**A:** ${currentSpelledAnswer}`;
+                    }
+
+                }, 50); // Small delay to handle rapid clicks
+            };
+
+            window.resetOuija = function() {
+                isOuijaActive = false;
+                currentSpelledAnswer = "";
+                currentQuestion = "";
+                ouijaQuestion.value = "";
+                ouijaQuestion.disabled = false;
+                ouijaButton.textContent = "Start Session";
+                ouijaButton.disabled = false;
+                currentOuijaAnswer.innerHTML = "The Planchette waits...";
+                // Move planchette back to the center/start position
+                planchette.style.transform = `translate(-50%, -50%)`;
+            };
+
+            // =========================================================
+            // GAME 22-100 (Customized and Enhanced)
+            // =========================================================
+
+            // --- 22. Arbitrary Progress (Custom Step) ---
+            let progressLevel = 0;
+            const progressLevelDisplay = document.getElementById('progressLevel');
+            const progressResult = document.getElementById('progressResult');
+            const progressStepInput = document.getElementById('progressStep');
+            window.increaseProgress = function() {
+                const step = parseInt(progressStepInput.value) || 10;
+                progressLevel = Math.min(100, progressLevel + step);
+                progressLevelDisplay.textContent = progressLevel;
+                progressResult.textContent = (progressLevel === 100) ? "Complete! Reset." : "Still progressing.";
+                if (progressLevel === 100) progressLevel = 0;
+            };
+
+            // --- 23. Binary Converter ---
+            const decInput = document.getElementById('decInput');
+            const binaryResult = document.getElementById('binaryResult');
+            window.convertToBinary = function() {
+                const dec = parseInt(decInput.value);
+                binaryResult.textContent = (dec >= 0) ? `Binary: ${dec.toString(2)}` : "Enter positive.";
+            };
+
+            // --- 24. Random Shape Generator (Custom) ---
+            const customShapesInput = document.getElementById('customShapes');
+            const shapeResult = document.getElementById('shapeResult');
+            window.generateShape = function() {
+                const customList = customShapesInput.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                if (customList.length === 0) { shapeResult.textContent = "Define shapes first."; return; }
+                shapeResult.textContent = `Shape: ${getRandomElement(customList)}`;
+            };
+            
+            // --- 25. Palindrome Check ---
+            const palindromeInput = document.getElementById('palindromeInput');
+            const palindromeResult = document.getElementById('palindromeResult');
+            window.checkPalindrome = function() {
+                const str = palindromeInput.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+                const reversedStr = str.split('').reverse().join('');
+                palindromeResult.textContent = (str.length > 0 && str === reversedStr) ? "Yes, it is a palindrome!" : "No, it is not.";
+            };
+
+            // --- 26. Odd/Even Clicker (Custom Range) ---
+            let oddEvenScore = 0;
+            const oddEvenScoreDisplay = document.getElementById('oddEvenScore');
+            const oddEvenResult = document.getElementById('oddEvenResult');
+            const oddEvenMaxInput = document.getElementById('oddEvenMax');
+            window.clickOddEven = function(isOddGuess) {
+                const max = parseInt(oddEvenMaxInput.value) || 100;
+                const num = Math.floor(Math.random() * max) + 1;
+                const isOdd = num % 2 !== 0;
+                if ((isOdd && isOddGuess) || (!isOdd && !isOddGuess)) {
+                    oddEvenScore++;
+                    oddEvenResult.textContent = `Correct! (${num})`;
+                } else {
+                    oddEvenScore--;
+                    oddEvenResult.textContent = `Wrong! (${num})`;
+                }
+                oddEvenScoreDisplay.textContent = oddEvenScore;
+            };
+
+            // --- 27. Vending Machine (Custom Cost) ---
+            let vmCredits = 10;
+            const vmCreditsDisplay = document.getElementById('vmCredits');
+            const vmResult = document.getElementById('vmResult');
+            const vmCostInput = document.getElementById('vmCost');
+            const vmItems = ["Gum", "Soda", "Stale Chip", "Broken Toy"];
+            window.buyItem = function() {
+                const cost = parseInt(vmCostInput.value) || 5;
+                if (vmCredits >= cost) {
+                    vmCredits -= cost;
+                    vmResult.textContent = `Dispensed: ${getRandomElement(vmItems)}`;
+                } else {
+                    vmResult.textContent = "Insufficient credits.";
+                }
+                vmCreditsDisplay.textContent = vmCredits;
+            };
+
+            // --- 28. Hex Color Generator ---
+            const hexResult = document.getElementById('hexResult');
+            window.generateHexColor = function() {
+                const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0').toUpperCase();
+                hexResult.textContent = color;
+                hexResult.style.backgroundColor = color;
+                hexResult.style.color = "#0a0a0a";
+            };
+
+            // --- 29. Time Waster Timer ---
+            let wasteTimerInterval;
+            let wasteTime = 0;
+            const wasteTimerDisplay = document.getElementById('wasteTimer');
+            window.startWasteTimer = function() {
+                if (!wasteTimerInterval) {
+                    wasteTimerInterval = setInterval(() => { wasteTime++; wasteTimerDisplay.textContent = `${wasteTime}s`; }, 1000);
+                }
+            };
+            window.stopWasteTimer = function() { clearInterval(wasteTimerInterval); wasteTimerInterval = null; };
+
+            // --- 30. Random Letter ---
+            const letterResult = document.getElementById('letterResult');
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            window.generateRandomLetter = function() { letterResult.textContent = getRandomElement(alphabet.split('')); };
+
+            // --- 31. Simple Calculator ---
+            const calcInput = document.getElementById('calcInput');
+            const calcResult = document.getElementById('calcResult');
+            window.calculate = function() {
+                try {
+                    const result = eval(calcInput.value);
+                    calcResult.textContent = `Result: ${result}`;
+                } catch (e) {
+                    calcResult.textContent = "Invalid expression.";
+                }
+            };
+
+            // --- 32. Quote Reverser (Custom Length) ---
+            const reverseResult = document.getElementById('reverseResult');
+            const reverseLenInput = document.getElementById('reverseLen');
+            window.reverseQuote = function() {
+                const len = parseInt(reverseLenInput.value) || 10;
+                const quote = getRandomElement(quotes);
+                reverseResult.textContent = quote.substring(0, len).split('').reverse().join('');
+            };
+
+            // --- 33. Fibonacci Step ---
+            let fibPrev = 0; let fibCurrent = 1;
+            const fibCurrentDisplay = document.getElementById('fibCurrent');
+            const fibResult = document.getElementById('fibResult');
+            window.nextFib = function() {
+                const next = fibPrev + fibCurrent;
+                fibPrev = fibCurrent;
+                fibCurrent = next;
+                fibCurrentDisplay.textContent = fibCurrent.toLocaleString();
+                fibResult.textContent = `Next is ${fibPrev + fibCurrent}`;
+            };
+
+            // --- 34. Health Bar Sim (Custom Damage) ---
+            let health = 100;
+            const healthDisplay = document.getElementById('healthDisplay');
+            const healthResult = document.getElementById('healthResult');
+            const damageMaxInput = document.getElementById('damageMax');
+            window.takeDamage = function() {
+                const max = parseInt(damageMaxInput.value) || 20;
+                const damage = Math.floor(Math.random() * max) + 1;
+                health = Math.max(0, health - damage);
+                healthDisplay.textContent = health;
+                healthResult.textContent = `-${damage} HP. ${health <= 0 ? "DEAD" : "Ouch!"}`;
+            };
+            window.heal = function() {
+                const healAmt = Math.floor(Math.random() * 15) + 5;
+                health = Math.min(100, health + healAmt);
+                healthDisplay.textContent = health;
+                healthResult.textContent = `+${healAmt} HP.`;
+            };
+
+            // --- 35. Word Censorship (Custom Char) ---
+            const censorInput = document.getElementById('censorInput');
+            const censorResult = document.getElementById('censorResult');
+            const censorCharInput = document.getElementById('censorChar');
+            window.censorVowels = function() {
+                const censorChar = censorCharInput.value || '*';
+                censorResult.textContent = censorInput.value.replace(/[aeiouAEIOU]/g, censorChar);
+            };
+
+            // --- 36. Click Limit (Custom) ---
+            const maxClickLimitInput = document.getElementById('maxClickLimit');
+            let clickLimit = parseInt(maxClickLimitInput.value) || 10;
+            const clickLimitDisplay = document.getElementById('clickLimit');
+            const limitedResult = document.getElementById('limitedResult');
+            window.limitedClick = function() {
+                if (clickLimit > 0) {
+                    clickLimit--;
+                    clickLimitDisplay.textContent = clickLimit;
+                    limitedResult.textContent = `Clicks left: ${clickLimit}`;
+                } else {
+                    limitedResult.textContent = "Limit reached! Reload page.";
+                }
+            };
+            maxClickLimitInput.addEventListener('change', () => { clickLimit = parseInt(maxClickLimitInput.value) || 10; clickLimitDisplay.textContent = clickLimit; limitedResult.textContent = "Reset max clicks."; });
+
+
+            // --- 37. Word Length Count ---
+            const wordLengthInput = document.getElementById('wordLengthInput');
+            const wordLengthResult = document.getElementById('wordLengthResult');
+            window.countWordLength = function() {
+                wordLengthResult.textContent = `Length: ${wordLengthInput.value.trim().length}`;
+            };
+
+            // --- 38. Random Button Press ---
+            const targetButton = document.getElementById('targetButton');
+            const targetResult = document.getElementById('targetResult');
+            let targetColor = Math.random() < 0.5 ? 'blue' : 'red';
+            targetButton.style.backgroundColor = (targetColor === 'blue') ? '#4fc3f7' : '#ff5252';
+            window.clickTarget = function() {
+                const clickedColor = (targetButton.style.backgroundColor.includes('79, 195, 247')) ? 'blue' : 'red'; // Check for RGB blue
+                if (clickedColor === targetColor) { targetResult.textContent = "Correct! New Target."; }
+                else { targetResult.textContent = "Wrong! New Target."; }
+                targetColor = Math.random() < 0.5 ? 'blue' : 'red';
+                targetButton.style.backgroundColor = (targetColor === 'blue') ? '#4fc3f7' : '#ff5252';
+            };
+            
+            // --- 39. Simple Lottery (Custom) ---
+            let lottoTickets = 10;
+            const lottoTicketsDisplay = document.getElementById('lottoTickets');
+            const lottoResult = document.getElementById('lottoResult');
+            const lottoCostInput = document.getElementById('lottoCost');
+            const lottoWinPctInput = document.getElementById('lottoWinPct');
+            window.buyLotto = function() {
+                const cost = parseInt(lottoCostInput.value) || 1;
+                lottoTickets += cost; lottoTicketsDisplay.textContent = lottoTickets; lottoResult.textContent = `Ticket bought (+${cost}).`;
+            };
+            window.checkLotto = function() {
+                const winPct = parseInt(lottoWinPctInput.value) / 100 || 0.1;
+                const cost = parseInt(lottoCostInput.value) || 1;
+                if (lottoTickets >= cost) {
+                    lottoTickets -= cost;
+                    if (Math.random() < winPct) { lottoResult.textContent = "WINNER! (+5 tickets)"; lottoTickets += 5; }
+                    else { lottoResult.textContent = "Loss."; }
+                    lottoTicketsDisplay.textContent = lottoTickets;
+                } else {
+                    lottoResult.textContent = "Buy a ticket first!";
+                }
+            };
+
+            // --- 40. Case Converter ---
+            const capInput = document.getElementById('capInput');
+            const capResult = document.getElementById('capResult');
+            window.capitalizeText = function(mode) {
+                if (mode === 'upper') { capResult.textContent = capInput.value.toUpperCase(); }
+                else { capResult.textContent = capInput.value.toLowerCase(); }
+            };
+
+            // --- 41. Color Guess (3 Options) ---
+            const colorGuessTarget = document.getElementById('colorGuessTarget');
+            const colorGuessResult = document.getElementById('colorGuessResult');
+            const colors = [{name: 'RED', hex: '#ff5252'}, {name: 'BLUE', hex: '#4fc3f7'}, {name: 'GREEN', hex: '#69f0ae'}];
+            let targetColorIndex = Math.floor(Math.random() * 3);
+            function updateColorTarget() {
+                targetColorIndex = Math.floor(Math.random() * 3);
+                colorGuessTarget.style.color = colors[targetColorIndex].hex;
+                colorGuessTarget.textContent = '?';
+            }
+            updateColorTarget();
+            window.guessColor = function(guessIndex) {
+                if (guessIndex === targetColorIndex) { colorGuessResult.textContent = "Correct!"; }
+                else { colorGuessResult.textContent = `Wrong! It was ${colors[targetColorIndex].name}.`; }
+                updateColorTarget();
+            };
+
+            // --- 42. Character Duplicator (Custom Count) ---
+            const dupInput = document.getElementById('dupInput');
+            const dupResult = document.getElementById('dupResult');
+            const dupCountInput = document.getElementById('dupCount');
+            window.duplicateChar = function() {
+                const count = parseInt(dupCountInput.value) || 5;
+                dupResult.textContent = dupInput.value.repeat(count);
+            };
+
+            // --- 43. Countdown (Custom) ---
+            const countdownDisplay = document.getElementById('countdownDisplay');
+            const countdownResult = document.getElementById('countdownResult');
+            const countdownMaxInput = document.getElementById('countdownMax');
+            let countdownInterval;
+            let countValue;
+            window.startCountdown = function() {
+                if (countdownInterval) clearInterval(countdownInterval);
+                const max = parseInt(countdownMaxInput.value) || 5;
+                countValue = max;
+                countdownDisplay.textContent = countValue;
+                countdownResult.textContent = "Counting...";
+                countdownInterval = setInterval(() => {
+                    countValue--;
+                    countdownDisplay.textContent = countValue;
+                    if (countValue <= 0) {
+                        clearInterval(countdownInterval);
+                        countdownResult.textContent = "Done!";
+                    }
+                }, 1000);
+            };
+
+            // --- 44. Simple Pet Sim (Custom Cost) ---
+            let petFood = 10;
+            const petFoodDisplay = document.getElementById('petFood');
+            const petResult = document.getElementById('petResult');
+            const petCostInput = document.getElementById('petCost');
+            const petStatus = ["Happy", "Hungry", "Sleeping", "Wasting Time"];
+            window.feedPet = function() {
+                const cost = parseInt(petCostInput.value) || 1;
+                if (petFood >= cost) {
+                    petFood -= cost;
+                    petResult.textContent = `Pet: ${getRandomElement(petStatus)}`;
+                } else {
+                    petResult.textContent = "Pet is gone.";
+                }
+                petFoodDisplay.textContent = petFood;
+            };
+
+            // --- 45. Word Scrambler ---
+            const scrambleInput = document.getElementById('scrambleInput');
+            const scrambleResult = document.getElementById('scrambleResult');
+            window.scrambleWord = function() {
+                const word = scrambleInput.value.split('');
+                for (let i = word.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [word[i], word[j]] = [word[j], word[i]];
+                }
+                scrambleResult.textContent = word.join('');
+            };
+
+            // --- 46. Prime Checker ---
+            const primeInput = document.getElementById('primeInput');
+            const primeResult = document.getElementById('primeResult');
+            window.checkPrime = function() {
+                const num = parseInt(primeInput.value);
+                if (isNaN(num) || num <= 1) { primeResult.textContent = "Not prime."; return; }
+                for (let i = 2; i <= Math.sqrt(num); i++) {
+                    if (num % i === 0) { primeResult.textContent = "Not prime."; return; }
+                }
+                primeResult.textContent = "It is prime!";
+            };
+
+            // --- 47. Guess the Shape ---
+            const shapeGuessResult = document.getElementById('shapeGuessResult');
+            const shapes47 = ["Circle", "Square", "Triangle"];
+            window.guessShape = function(guess) {
+                const actualShape = getRandomElement(shapes47);
+                if (guess === actualShape) { shapeGuessResult.textContent = `Correct! It was ${actualShape}.`; }
+                else { shapeGuessResult.textContent = `Wrong! It was ${actualShape}.`; }
+            };
+
+            // --- 48. Click Speed (Custom Duration) ---
+            let clickSpeedCount = 0;
+            let clickSpeedRunning = false;
+            const speedDisplay = document.getElementById('speedDisplay');
+            const speedResult = document.getElementById('speedResult');
+            const speedDurationInput = document.getElementById('speedDuration');
+            window.startClickSpeed = function() {
+                if (clickSpeedRunning) return;
+                clickSpeedRunning = true;
+                clickSpeedCount = 0;
+                const duration = parseInt(speedDurationInput.value) || 5;
+                speedResult.textContent = `Click for ${duration}s!`;
+                
+                const clickHandler = () => { clickSpeedCount++; };
+                document.addEventListener('click', clickHandler);
+
+                setTimeout(() => {
+                    document.removeEventListener('click', clickHandler);
+                    const clicksPerSecond = (clickSpeedCount / duration).toFixed(2);
+                    speedDisplay.textContent = clicksPerSecond;
+                    speedResult.textContent = `Final Clicks: ${clickSpeedCount}`;
+                    clickSpeedRunning = false;
+                }, duration * 1000);
+            };
+
+            // --- 49. List Shuffler ---
+            const listInput = document.getElementById('listInput');
+            const listResult = document.getElementById('listResult');
+            window.shuffleList = function() {
+                let items = listInput.value.split(',').map(s => s.trim()).filter(s => s.length > 0);
+                for (let i = items.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [items[i], items[j]] = [items[j], items[i]];
+                }
+                listResult.textContent = items.join(' | ');
+            };
+
+            // --- 50. Dice Sum (Multi) ---
+            let diceSumTotal = 0;
+            const diceSumTotalDisplay = document.getElementById('diceSumTotal');
+            const diceSumResult = document.getElementById('diceSumResult');
+            const numDiceInput = document.getElementById('numDice');
+            window.rollTwoDice = function() {
+                const numDice = parseInt(numDiceInput.value) || 2;
+                let currentSum = 0;
+                for(let i=0; i<numDice; i++) {
+                    currentSum += Math.floor(Math.random() * 6) + 1;
+                }
+                diceSumTotal += currentSum;
+                diceSumTotalDisplay.textContent = diceSumTotal;
+                diceSumResult.textContent = `Rolled ${numDice} dice. Sum: ${currentSum}`;
+            };
+
+            // --- 51. Roman Numeral ---
+            const romanInput = document.getElementById('romanInput');
+            const romanResult = document.getElementById('romanResult');
+            const romanMap = { 100: 'C', 90: 'XC', 50: 'L', 40: 'XL', 10: 'X', 9: 'IX', 5: 'V', 4: 'IV', 1: 'I' };
+            window.convertToRoman = function() {
+                let num = parseInt(romanInput.value);
+                if (isNaN(num) || num < 1 || num > 100) { romanResult.textContent = "Range 1-100."; return; }
+                let result = '';
+                for (let i in romanMap) {
+                    while (num >= i) { result += romanMap[i]; num -= i; }
+                }
+                romanResult.textContent = result;
+            };
+
+            // --- 52. Area Calc (Rect) ---
+            const lenInput = document.getElementById('lenInput');
+            const widInput = document.getElementById('widInput');
+            const areaResult = document.getElementById('areaResult');
+            window.calcArea = function() {
+                const l = parseFloat(lenInput.value);
+                const w = parseFloat(widInput.value);
+                if (isNaN(l) || isNaN(w) || l < 0 || w < 0) { areaResult.textContent = "Invalid."; return; }
+                areaResult.textContent = `Area: ${l * w}`;
+            };
+
+            // --- 53. Button Order (Custom) ---
+            const orderStepsInput = document.getElementById('orderSteps');
+            const orderButtonsContainer = document.getElementById('orderButtons');
+            const orderResult = document.getElementById('orderResult');
+            let nextOrder = 1;
+
+            function renderOrderButtons() {
+                const steps = parseInt(orderStepsInput.value) || 3;
+                orderButtonsContainer.innerHTML = '';
+                for (let i = 1; i <= steps; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.onclick = () => window.pressOrder(i);
+                    orderButtonsContainer.appendChild(button);
+                }
+                nextOrder = 1;
+                orderResult.textContent = "Start with 1.";
+            }
+            orderStepsInput.addEventListener('change', renderOrderButtons);
+            renderOrderButtons();
+
+            window.pressOrder = function(num) {
+                if (num === nextOrder) {
+                    nextOrder++;
+                    const maxSteps = parseInt(orderStepsInput.value) || 3;
+                    if (nextOrder > maxSteps) {
+                        orderResult.textContent = "Success! Resetting.";
+                        nextOrder = 1;
+                    } else {
+                        orderResult.textContent = `Next: ${nextOrder}`;
+                    }
+                } else {
+                    orderResult.textContent = "Fail! Start with 1.";
+                    nextOrder = 1;
+                }
+            };
+
+            // --- 54. Random Name ---
+            const nameResult = document.getElementById('nameResult');
+            const firstNames = ["Zorp", "Xylo", "Anya", "Bob", "Cid", "Lira", "Kael", "Riven"];
+            const lastNames = ["Flim", "Vortex", "Smith", "Jones", "King", "Zero", "Shadow", "Dune"];
+            window.generateName = function() {
+                nameResult.textContent = `${getRandomElement(firstNames)} ${getRandomElement(lastNames)}`;
+            };
+
+            // --- 55. Multi-Counter ---
+            let c1 = 0; let c2 = 0;
+            const c1Display = document.getElementById('c1');
+            const c2Display = document.getElementById('c2');
+            window.incC1 = function() { c1++; c1Display.textContent = c1; };
+            window.incC2 = function() { c2++; c2Display.textContent = c2; };
+
+            // --- 56. Day of Week ---
+            const dayIndexInput = document.getElementById('dayIndex');
+            const dayResult = document.getElementById('dayResult');
+            const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            window.getDayName = function() {
+                const index = parseInt(dayIndexInput.value);
+                dayResult.textContent = (index >= 1 && index <= 7) ? days[index - 1] : "Invalid day (1-7).";
+            };
+
+            // --- 57. Word Length Filter (Custom Min Length) ---
+            const filterInput = document.getElementById('filterInput');
+            const filterResult = document.getElementById('filterResult');
+            const filterMinLenInput = document.getElementById('filterMinLen');
+            window.filterWords = function() {
+                const minLen = parseInt(filterMinLenInput.value) || 4;
+                const filtered = filterInput.value.split(',').map(s => s.trim()).filter(w => w.length >= minLen);
+                filterResult.textContent = filtered.join(', ');
+            };
+
+            // --- 58. Epoch Time Check ---
+            const epochResult = document.getElementById('epochResult');
+            window.getEpoch = function() { epochResult.textContent = `Epoch: ${Math.floor(Date.now() / 1000)}`; };
+
+            // --- 59. Sentence Case ---
+            const sentenceInput = document.getElementById('sentenceInput');
+            const sentenceResult = document.getElementById('sentenceResult');
+            window.toSentenceCase = function() {
+                const str = sentenceInput.value.toLowerCase();
+                sentenceResult.textContent = str.charAt(0).toUpperCase() + str.slice(1);
+            };
+
+            // --- 60. Even/Odd Prediction (Custom Range) ---
+            const predictResult = document.getElementById('predictResult');
+            const predictMaxInput = document.getElementById('predictMax');
+            window.predictEvenOdd = function(guess) {
+                const max = parseInt(predictMaxInput.value) || 100;
+                const num = Math.floor(Math.random() * max) + 1;
+                const actual = num % 2 === 0 ? "Even" : "Odd";
+                predictResult.textContent = `Roll: ${num} (${actual}). Guess: ${guess === actual ? 'Correct!' : 'Wrong!'}`;
+            };
+
+            // --- 61. Dice Roll History (Custom Max History) ---
+            const diceHistDisplay = document.getElementById('diceHist');
+            const historyResult = document.getElementById('historyResult');
+            const historyMaxInput = document.getElementById('historyMax');
+            let diceHistory = [];
+            window.trackDiceHistory = function() {
+                const maxHist = parseInt(historyMaxInput.value) || 5;
+                const roll = Math.floor(Math.random() * 6) + 1;
+                diceHistory.push(roll);
+                diceHistDisplay.textContent = `Rolls: ${diceHistory.slice(-maxHist).join(', ')}`;
+                historyResult.textContent = `Total rolls: ${diceHistory.length}`;
+            };
+
+            // --- 62. Button Masher ---
+            let mashCount = 0;
+            const mashCountDisplay = document.getElementById('mashCount');
+            window.mashButton = function() { mashCount++; mashCountDisplay.textContent = mashCount; };
+
+            // --- 63. Color Fader (Custom Speed) ---
+            const fadeBox = document.getElementById('fadeBox');
+            const fadeSpeedInput = document.getElementById('fadeSpeed');
+            let fadeInterval;
+            let fadeR = 255;
+            window.startFading = function() {
+                if (fadeInterval) clearInterval(fadeInterval);
+                const speed = parseInt(fadeSpeedInput.value) || 100;
+                fadeInterval = setInterval(() => {
+                    fadeR = (fadeR > 0) ? fadeR - 5 : 255;
+                    const hex = rgbToHex(fadeR, 0, 0);
+                    fadeBox.style.backgroundColor = hex;
+                }, speed);
+            };
+
+            // --- 64. Number Sorter ---
+            const sortInput = document.getElementById('sortInput');
+            const sortResult = document.getElementById('sortResult');
+            window.sortNumbers = function(mode) {
+                const numbers = sortInput.value.split(',').map(n => parseInt(n.trim())).filter(n => !isNaN(n));
+                if (mode === 'asc') { sortResult.textContent = numbers.sort((a, b) => a - b).join(', '); }
+                else { sortResult.textContent = numbers.sort((a, b) => b - a).join(', '); }
+            };
+
+            // --- 65. Time Until Reset (Custom Duration) ---
+            const resetTimeDisplay = document.getElementById('resetTime');
+            const resetMessage = document.getElementById('resetMessage');
+            const resetDurationInput = document.getElementById('resetDuration');
+            let resetTimer;
+            let resetValue;
+            window.startResetTimer = function() {
+                if (resetTimer) clearInterval(resetTimer);
+                const duration = parseInt(resetDurationInput.value) || 60;
+                resetValue = duration;
+                resetTimeDisplay.textContent = `${resetValue}s`;
+                resetMessage.textContent = "Time left...";
+                resetTimer = setInterval(() => {
+                    resetValue--;
+                    resetTimeDisplay.textContent = `${resetValue}s`;
+                    if (resetValue <= 0) {
+                        clearInterval(resetTimer);
+                        resetMessage.textContent = "Game reset! (Page refresh required).";
+                    }
+                }, 1000);
+            };
+
+            // --- 66. Simple Blackjack (Custom Target) ---
+            let bjTotal = 0;
+            const bjTotalDisplay = document.getElementById('bjTotal');
+            const bjResult = document.getElementById('bjResult');
+            const bjTargetInput = document.getElementById('bjTarget');
+            window.hitBlackjack = function() {
+                const target = parseInt(bjTargetInput.value) || 21;
+                if (bjTotal >= target) { bjResult.textContent = "Bust/Win! Reset."; return; }
+                const card = Math.floor(Math.random() * 10) + 1;
+                bjTotal += card;
+                bjTotalDisplay.textContent = bjTotal;
+                if (bjTotal > target) bjResult.textContent = `Bust (${bjTotal})!`;
+                else if (bjTotal === target) bjResult.textContent = `WIN!`;
+                else bjResult.textContent = `Drew ${card}.`;
+            };
+            window.resetBlackjack = function() { bjTotal = 0; bjTotalDisplay.textContent = 0; bjResult.textContent = "New game."; };
+
+            // --- 67. Reverse Click (Custom Start) ---
+            const revStartInput = document.getElementById('revStart');
+            let revTarget = parseInt(revStartInput.value) || 10;
+            const revTargetDisplay = document.getElementById('revTarget');
+            const revResult = document.getElementById('revResult');
+            revStartInput.addEventListener('change', () => { revTarget = parseInt(revStartInput.value) || 10; revTargetDisplay.textContent = revTarget; });
+            window.reverseClick = function() {
+                if (revTarget > 0) { revTarget--; revTargetDisplay.textContent = revTarget; revResult.textContent = `${revTarget} left.`; }
+                else { revResult.textContent = "You win nothing."; revTarget = parseInt(revStartInput.value) || 10; revTargetDisplay.textContent = revTarget; }
+            };
+
+            // --- 68. Word Replacer (Custom) ---
+            const replaceInput = document.getElementById('replaceInput');
+            const replaceResult = document.getElementById('replaceResult');
+            const replaceOldInput = document.getElementById('replaceOld');
+            const replaceNewInput = document.getElementById('replaceNew');
+            window.replaceWord = function() {
+                const oldWord = replaceOldInput.value;
+                const newWord = replaceNewInput.value;
+                const regex = new RegExp(oldWord, 'gi');
+                replaceResult.textContent = replaceInput.value.replace(regex, newWord);
+            };
+
+            // --- 69. Unit Converter ---
+            const unitInput = document.getElementById('unitInput');
+            const unitResult = document.getElementById('unitResult');
+            window.convertUnits = function(mode) {
+                const val = parseFloat(unitInput.value);
+                if (isNaN(val)) { unitResult.textContent = "Invalid."; return; }
+                if (mode === 'kmToMi') { unitResult.textContent = `${(val * 0.621371).toFixed(2)} mi`; }
+                else { unitResult.textContent = `${(val * 1.60934).toFixed(2)} km`; }
+            };
+
+            // --- 70. Random Emoji ---
+            const emojiResult = document.getElementById('emojiResult');
+            const emojis = ["😀", "😂", "🤯", "🤖", "😴", "🍕", "🔥", "🌍", "💀", "💩"];
+            window.generateEmoji = function() { emojiResult.textContent = getRandomElement(emojis); };
+
+            // --- 71. Secret Phrase ---
+            const phraseInput = document.getElementById('phraseInput');
+            const phraseResult = document.getElementById('phraseResult');
+            const secretPhrase = "ZERO EFFORT";
+            window.checkPhrase = function() {
+                if (phraseInput.value.toUpperCase() === secretPhrase) { phraseResult.textContent = "ACCESS GRANTED. (You wasted time.)"; }
+                else { phraseResult.textContent = "Access Denied."; }
+            };
+
+            // --- 72. Color Mixer 2 (RGB) ---
+            const rInput = document.getElementById('rInput');
+            const gInput = document.getElementById('gInput');
+            const bInput = document.getElementById('bInput');
+            const rgbBox = document.getElementById('rgbBox');
+            window.showRgbColor = function() {
+                const r = parseInt(rInput.value || 0);
+                const g = parseInt(gInput.value || 0);
+                const b = parseInt(bInput.value || 0);
+                if (r > 255 || g > 255 || b > 255 || r < 0 || g < 0 || b < 0) { rgbBox.style.backgroundColor = 'transparent'; return; }
+                rgbBox.style.backgroundColor = `rgb(${r}, ${g}, ${b})`;
+            };
+
+            // --- 73. Letter Remover (Custom Position) ---
+            const removeInput = document.getElementById('removeInput');
+            const removeResult = document.getElementById('removeResult');
+            const removePosInput = document.getElementById('removePos');
+            window.removeFirstLetter = function() {
+                const pos = parseInt(removePosInput.value) || 0;
+                const str = removeInput.value;
+                if (pos >= 0 && pos < str.length) {
+                    removeResult.textContent = str.slice(0, pos) + str.slice(pos + 1);
+                } else {
+                    removeResult.textContent = "Invalid position.";
+                }
+            };
+
+            // --- 74. Dice Roll Multiplier (Custom Sides) ---
+            let multScore = 0;
+            const multScoreDisplay = document.getElementById('multScore');
+            const multResult = document.getElementById('multResult');
+            const multSidesInput = document.getElementById('multSides');
+            window.rollAndMultiply = function() {
+                const sides = parseInt(multSidesInput.value) || 6;
+                const d1 = Math.floor(Math.random() * sides) + 1;
+                const d2 = Math.floor(Math.random() * sides) + 1;
+                const multiplier = d1 * d2;
+                multScore += multiplier;
+                multScoreDisplay.textContent = multScore;
+                multResult.textContent = `Rolled ${d1} x ${d2} = ${multiplier}.`;
+            };
+
+            // --- 75. Mood Tracker ---
+            const moodDisplay = document.getElementById('moodDisplay');
+            const moods = ["Excited", "Bored", "Minimalist", "Confused", "Productive (Lie)", "Stressed"];
+            window.changeMood = function() { moodDisplay.textContent = getRandomElement(moods); };
+
+            // --- 76. Input Mirror ---
+            const mirrorInput = document.getElementById('mirrorInput');
+            const mirrorResult = document.getElementById('mirrorResult');
+            mirrorInput.addEventListener('input', () => { mirrorResult.textContent = mirrorInput.value; });
+
+            // --- 77. Random Integer (Custom Max) ---
+            const largeRandomResult = document.getElementById('largeRandomResult');
+            const randMaxInput = document.getElementById('randMax');
+            window.getLargeRandom = function() {
+                const max = parseInt(randMaxInput.value) || 1000;
+                largeRandomResult.textContent = Math.floor(Math.random() * max) + 1;
+            };
+
+            // --- 78. Word Counter ---
+            const wordCountInput = document.getElementById('wordCountInput');
+            const wordCountResult = document.getElementById('wordCountResult');
+            window.countWords = function() {
+                const wordCount = wordCountInput.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+                wordCountResult.textContent = `Words: ${wordCount}`;
+            };
+
+            // --- 79. Time of Day Guess ---
+            const timeGuessResult = document.getElementById('timeGuessResult');
+            window.checkTimeGuess = function() {
+                const hour = new Date().getHours();
+                const actual = hour >= 12 ? 'PM' : 'AM';
+                const guess = Math.random() < 0.5 ? 'AM' : 'PM';
+                timeGuessResult.textContent = `Guess: ${guess}. Actual: ${actual}. ${guess === actual ? 'Correct!' : 'Wrong!'}`;
+            };
+
+            // --- 80. Sequential Clicker (Custom Length) ---
+            const seqLenInput = document.getElementById('seqLen');
+            const seqButtonsContainer = document.getElementById('seqButtons');
+            const seqTargetDisplay = document.getElementById('seqTarget');
+            const seqResult = document.getElementById('seqResult');
+            let seqTarget = 1;
+
+            function renderSeqButtons() {
+                const len = parseInt(seqLenInput.value) || 3;
+                seqButtonsContainer.innerHTML = '';
+                for (let i = 1; i <= len; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.onclick = () => window.seqClick(i);
+                    seqButtonsContainer.appendChild(button);
+                }
+                seqTarget = 1;
+                seqTargetDisplay.textContent = seqTarget;
+                seqResult.textContent = "Start with 1.";
+            }
+            seqLenInput.addEventListener('change', renderSeqButtons);
+            renderSeqButtons();
+
+            window.seqClick = function(num) {
+                if (num === seqTarget) {
+                    seqTarget++;
+                    const len = parseInt(seqLenInput.value) || 3;
+                    if (seqTarget > len) { seqResult.textContent = "SUCCESS!"; seqTarget = 1; }
+                    else { seqResult.textContent = `Press ${seqTarget}.`; }
+                } else {
+                    seqResult.textContent = "FAIL! Start over."; seqTarget = 1;
+                }
+                seqTargetDisplay.textContent = seqTarget;
+            };
+
+            // --- 81. Button Swap (Custom) ---
+            let swapTarget = 'A';
+            const swapTargetDisplay = document.getElementById('swapTarget');
+            const swapResult = document.getElementById('swapResult');
+            window.swapClick = function(clicked) {
+                if (clicked === swapTarget) { swapResult.textContent = "Hit!"; }
+                else { swapResult.textContent = "Miss."; }
+                swapTarget = Math.random() < 0.5 ? 'A' : 'B';
+                swapTargetDisplay.textContent = swapTarget;
+            };
+
+            // --- 82. Day Number ---
+            const dayNumResult = document.getElementById('dayNumResult');
+            window.getDayNumber = function() {
+                const now = new Date();
+                const start = new Date(now.getFullYear(), 0, 0);
+                const diff = now - start;
+                const oneDay = 1000 * 60 * 60 * 24;
+                dayNumResult.textContent = `Day ${Math.floor(diff / oneDay)}`;
+            };
+
+            // --- 83. Simple Inventory Craft (Custom Cost) ---
+            const craftCostInput = document.getElementById('craftCost');
+            let invWood = 10; let invStone = 10;
+            const invWoodDisplay = document.getElementById('invWood');
+            const invStoneDisplay = document.getElementById('invStone');
+            const craftResult = document.getElementById('craftResult');
+            let craftedItems = 0;
+
+            function updateCraftInventory() {
+                invWoodDisplay.textContent = invWood;
+                invStoneDisplay.textContent = invStone;
+                craftResult.textContent = `Items: ${craftedItems}`;
+            }
+            updateCraftInventory();
+
+            window.craftItem = function() {
+                const cost = parseInt(craftCostInput.value) || 5;
+                if (invWood >= cost && invStone >= cost) {
+                    invWood -= cost; invStone -= cost;
+                    craftedItems++;
+                    updateCraftInventory();
+                } else {
+                    craftResult.textContent = `Need ${cost}W and ${cost}S!`;
+                }
+            };
+            // Add initial resources randomly (for infinite play)
+            setInterval(() => {
+                invWood += Math.floor(Math.random() * 2);
+                invStone += Math.floor(Math.random() * 2);
+                updateCraftInventory();
+            }, 5000);
+
+
+            // --- 84. Text Repetition (Custom Count) ---
+            const repeatInput = document.getElementById('repeatInput');
+            const repeatResult = document.getElementById('repeatResult');
+            const repeatCountInput = document.getElementById('repeatCount');
+            window.repeatText = function() {
+                const count = parseInt(repeatCountInput.value) || 3;
+                repeatResult.textContent = repeatInput.value.repeat(count);
+            };
+
+            // --- 85. Random Capital/Lower ---
+            const caseInput = document.getElementById('caseInput');
+            const caseResult = document.getElementById('caseResult');
+            window.randomCase = function() {
+                let result = '';
+                for (const char of caseInput.value) {
+                    result += Math.random() < 0.5 ? char.toUpperCase() : char.toLowerCase();
+                }
+                caseResult.textContent = result;
+            };
+
+            // --- 86. Trivial Geometry ---
+            const sideInput = document.getElementById('sideInput');
+            const geomResult = document.getElementById('geomResult');
+            window.calcPerimeter = function() {
+                const side = parseFloat(sideInput.value);
+                if (isNaN(side) || side < 0) { geomResult.textContent = "Invalid."; return; }
+                geomResult.textContent = `P: ${side * 4}`;
+            };
+
+            // --- 87. Input Hide/Show ---
+            const hideInput = document.getElementById('hideInput');
+            const hideResult = document.getElementById('hideResult');
+            window.toggleInput = function() {
+                const isHidden = hideInput.style.display === 'none';
+                hideInput.style.display = isHidden ? 'block' : 'none';
+                hideResult.textContent = isHidden ? "Visible." : "Hidden.";
+            };
+
+            // --- 88. Number Square Root ---
+            const sqrtInput = document.getElementById('sqrtInput');
+            const sqrtResult = document.getElementById('sqrtResult');
+            window.calculateSqrt = function() {
+                const num = parseFloat(sqrtInput.value);
+                if (isNaN(num) || num < 0) { sqrtResult.textContent = "Invalid or negative."; return; }
+                sqrtResult.textContent = `√: ${Math.sqrt(num).toFixed(4)}`;
+            };
+
+            // --- 89. Sentence Length ---
+            const sentenceLenInput = document.getElementById('sentenceLenInput');
+            const sentenceLenResult = document.getElementById('sentenceLenResult');
+            window.checkSentenceLength = function() {
+                const len = sentenceLenInput.value.trim().length;
+                sentenceLenResult.textContent = `Length ${len}. ${len > 10 ? 'Long' : 'Short'}.`;
+            };
+
+            // --- 90. Random Wait Timer (Custom Max) ---
+            const waitTimerDisplay = document.getElementById('waitTimerDisplay');
+            const waitResult = document.getElementById('waitResult');
+            const waitMaxInput = document.getElementById('waitMax');
+            let waitTimerInterval;
+            window.startRandomWait = function() {
+                if (waitTimerInterval) return;
+                const max = parseInt(waitMaxInput.value) || 3;
+                const randomTime = Math.floor(Math.random() * max) + 1;
+                waitTimerDisplay.textContent = "Waiting...";
+                waitResult.textContent = `Wait for ${randomTime} seconds.`;
+                let remaining = randomTime;
+
+                waitTimerInterval = setInterval(() => {
+                    remaining--;
+                    waitTimerDisplay.textContent = `${remaining}s remaining...`;
+                    if (remaining <= 0) {
+                        clearInterval(waitTimerInterval);
+                        waitTimerInterval = null;
+                        waitTimerDisplay.textContent = "Done!";
+                        waitResult.textContent = "Time wasted successfully.";
+                    }
+                }, 1000);
+            };
+
+            // --- 91. Binary Flip (Custom Bits) ---
+            const binaryBitsInput = document.getElementById('binaryBits');
+            const binaryFlipDisplay = document.getElementById('binaryFlip');
+            let binary = [0, 0, 0, 0];
+            function initializeBinary() {
+                const bits = parseInt(binaryBitsInput.value) || 4;
+                binary = Array(bits).fill(0);
+                binaryFlipDisplay.textContent = binary.join('');
+            }
+            binaryBitsInput.addEventListener('change', initializeBinary);
+            initializeBinary();
+
+            window.flipBit = function() {
+                if (binary.length === 0) return;
+                const index = Math.floor(Math.random() * binary.length);
+                binary[index] = 1 - binary[index];
+                binaryFlipDisplay.textContent = binary.join('');
+            };
+
+            // --- 92. Number to Word ---
+            const numToWordInput = document.getElementById('numToWordInput');
+            const numToWordResult = document.getElementById('numToWordResult');
+            const numWords = ["One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten"];
+            window.numToWord = function() {
+                const num = parseInt(numToWordInput.value);
+                numToWordResult.textContent = (num >= 1 && num <= 10) ? numWords[num - 1] : "1-10 only.";
+            };
+
+            // --- 93. Random Punctuation ---
+            const puncInput = document.getElementById('puncInput');
+            const puncResult = document.getElementById('puncResult');
+            const punctuation = [".", ",", "!", "?", ";"];
+            window.addPunctuation = function() {
+                puncResult.textContent = puncInput.value + getRandomElement(punctuation);
+            };
+
+            // --- 94. Alphabet Position ---
+            const alphaInput = document.getElementById('alphaInput');
+            const alphaResult = document.getElementById('alphaResult');
+            window.getAlphaPosition = function() {
+                const char = alphaInput.value.toUpperCase();
+                const pos = char.charCodeAt(0) - 'A'.charCodeAt(0) + 1;
+                alphaResult.textContent = (pos >= 1 && pos <= 26) ? pos : "Invalid letter.";
+            };
+
+            // --- 95. Click Color Change ---
+            const clickColorBox = document.getElementById('clickColorBox');
+            window.changeClickColor = function() {
+                const color = '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0');
+                clickColorBox.style.backgroundColor = color;
+            };
+
+            // --- 96. Simple Budget (Custom Start) ---
+            const budgetStartInput = document.getElementById('budgetStart');
+            let budgetCash = parseInt(budgetStartInput.value) || 100;
+            const budgetCashDisplay = document.getElementById('budgetCash');
+            const budgetResult = document.getElementById('budgetResult');
+            budgetCashDisplay.textContent = budgetCash;
+
+            window.spendMoney = function() { budgetCash = Math.max(0, budgetCash - 10); budgetCashDisplay.textContent = budgetCash; budgetResult.textContent = budgetCash === 0 ? "Bankrupt!" : "-10. Spend more!"; };
+            window.earnMoney = function() { budgetCash += 5; budgetCashDisplay.textContent = budgetCash; budgetResult.textContent = "+5. Good job."; };
+            budgetStartInput.addEventListener('change', () => { budgetCash = parseInt(budgetStartInput.value) || 100; budgetCashDisplay.textContent = budgetCash; budgetResult.textContent = "New start balance."; });
+
+
+            // --- 97. Odd Number Check ---
+            const oddCheckInput = document.getElementById('oddCheckInput');
+            const oddCheckResult = document.getElementById('oddCheckResult');
+            window.checkOdd = function() {
+                const num = parseInt(oddCheckInput.value);
+                if (isNaN(num)) { oddCheckResult.textContent = "Invalid."; return; }
+                oddCheckResult.textContent = num % 2 !== 0 ? "Yes, it's odd." : "No, it's even.";
+            };
+
+            // --- 98. Multi-Step Quiz (Custom) ---
+            let multiQuizStep = 0;
+            const multiQuizQ = document.getElementById('multiQuizQ');
+            const multiQuizResult = document.getElementById('multiQuizResult');
+            const quizQuestions = [
+                { q: "Q1: Is this page helpful?", a: "A" },
+                { q: "Q2: Is 1+1=2?", a: "A" },
+                { q: "Q3: Is the sky blue?", a: "B" }
+            ];
+            
+            multiQuizQ.textContent = quizQuestions[0].q;
+
+            window.nextQuizStep = function(answer) {
+                if (multiQuizStep >= quizQuestions.length) {
+                    multiQuizResult.textContent = "Quiz finished. Click to restart.";
+                    multiQuizStep = 0;
+                    multiQuizQ.textContent = quizQuestions[0].q;
+                    return;
+                }
+
+                if (answer === quizQuestions[multiQuizStep].a) {
+                    multiQuizStep++;
+                    if (multiQuizStep < quizQuestions.length) {
+                        multiQuizQ.textContent = quizQuestions[multiQuizStep].q;
+                        multiQuizResult.textContent = `Correct! Step ${multiQuizStep + 1}/${quizQuestions.length}`;
+                    } else {
+                        multiQuizQ.textContent = "COMPLETED! ALL CORRECT!";
+                        multiQuizResult.textContent = "Quiz finished.";
+                    }
+                } else {
+                    multiQuizResult.textContent = "Incorrect! Start over.";
+                    multiQuizStep = 0;
+                    multiQuizQ.textContent = quizQuestions[0].q;
+                }
+            };
+            
+            // --- 99. Simple Timer (Custom Duration) ---
+            const simpleTimerDisplay = document.getElementById('simpleTimer');
+            const simpleTimerResult = document.getElementById('simpleTimerResult');
+            const simpleDurationInput = document.getElementById('simpleDuration');
+            let simpleTimerValue;
+            let simpleTimerInterval;
+            window.startSimpleTimer = function() {
+                if (simpleTimerInterval) clearInterval(simpleTimerInterval);
+                const duration = parseInt(simpleDurationInput.value) || 10;
+                simpleTimerValue = duration;
+                simpleTimerDisplay.textContent = `${simpleTimerValue}s`;
+                simpleTimerResult.textContent = "Timing...";
+                simpleTimerInterval = setInterval(() => {
+                    simpleTimerValue--;
+                    simpleTimerDisplay.textContent = `${simpleTimerValue}s`;
+                    if (simpleTimerValue <= 0) {
+                        clearInterval(simpleTimerInterval);
+                        simpleTimerResult.textContent = "ZERO!";
+                    }
+                }, 1000);
+            };
+
+            // --- 100. Ultimate Counter (Custom Increment) ---
+            let ultimateCount = 0;
+            const ultimateCountDisplay = document.getElementById('ultimateCount');
+            const incrementRateInput = document.getElementById('incrementRate');
+            window.incrementUltimate = function() { 
+                const rate = parseInt(incrementRateInput.value) || 1;
+                ultimateCount += rate; 
+                ultimateCountDisplay.textContent = ultimateCount.toLocaleString(); 
+            };
+        });
+    </script>
+</body>
+</html>
+
+------------------------------------
+
+all the hundred games must have all their features and must be fully customizable. they all should be real fun to play and real time waster and full of engagement. plus modify the Ouija board game so that whenever I press the button the planchette moves to a random place(could be alphabet,number,yes/no,goodbye) the asked question must remain there and for a new question a button will be there and wherever the planchette lands must be written down and until new question button is pressed the session won't be over.
+
+however long the code may be give each 100 game their dedicated attention and make them complete and enjoyable.
+
+all the games are fitted into one page and all the games look very small, give the user a list to choose from and when the user chooses a game then the user will be able to play that game exclusively. all the games must look wonderful and have all their features.
+
